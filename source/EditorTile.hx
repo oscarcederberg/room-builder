@@ -38,7 +38,7 @@ class EditorTile extends FlxSprite {
 		hovering = false;
 		selected = false;
 
-		room_tile = new RoomTile(x, y, this);
+		room_tile = new RoomTile(x - 3, y - 104, this);
 		room_tile.visible = false;
 		parent.room_tiles.add(room_tile);
 
@@ -82,13 +82,6 @@ class EditorTile extends FlxSprite {
 		hovering = FlxCollision.pixelPerfectPointCheck(Std.int(mouse_pos.x), Std.int(mouse_pos.y), this);
 
 		if (hovering && !selected && FlxG.mouse.justPressed) {
-			trace("(" + col + ", " + row + ")");
-			if (corner_right == null) {
-				trace('CR NULL: (${col + 1},$row)');
-			}
-			if (corner_down == null) {
-				trace('CD NULL: ($col,${row + 2})');
-			}
 			selected = true;
 			room_tile.visible = true;
 			this.visible = false;
@@ -96,7 +89,6 @@ class EditorTile extends FlxSprite {
 			select();
 			selectNeighbours();
 		} else if (hovering && selected && FlxG.mouse.justPressed) {
-			trace("unselected");
 			selected = false;
 			room_tile.visible = false;
 			this.visible = true;

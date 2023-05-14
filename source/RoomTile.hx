@@ -11,60 +11,126 @@ class RoomTile extends FlxSprite {
 	}
 
 	public function updateGraphics() {
-		makeGraphic(45, 16, FlxColor.TRANSPARENT, true);
+		makeGraphic(51, 127, FlxColor.TRANSPARENT, true);
 
-		var mid = new FlxSprite();
-		var corner_left = new FlxSprite();
-		var corner_up = new FlxSprite();
-		var corner_right = new FlxSprite();
-		var corner_down = new FlxSprite();
-		var side_left = new FlxSprite();
-		var side_up = new FlxSprite();
-		var side_right = new FlxSprite();
-		var side_down = new FlxSprite();
+		var floor_mid = new FlxSprite();
+		var floor_corner_left = new FlxSprite();
+		var floor_corner_up = new FlxSprite();
+		var floor_corner_right = new FlxSprite();
+		var floor_corner_down = new FlxSprite();
+		var floor_side_left = new FlxSprite();
+		var floor_side_up = new FlxSprite();
+		var floor_side_right = new FlxSprite();
+		var floor_side_down = new FlxSprite();
 
-		mid.loadGraphic("assets/images/room_tile/mid.png");
-		corner_left.loadGraphic("assets/images/room_tile/corner_left.png");
-		corner_up.loadGraphic("assets/images/room_tile/corner_up.png");
-		corner_right.loadGraphic("assets/images/room_tile/corner_right.png");
-		corner_down.loadGraphic("assets/images/room_tile/corner_down.png");
-		side_left.loadGraphic("assets/images/room_tile/side_left.png");
-		side_up.loadGraphic("assets/images/room_tile/side_up.png");
-		side_right.loadGraphic("assets/images/room_tile/side_right.png");
-		side_down.loadGraphic("assets/images/room_tile/side_down.png");
+		var wall_corner_left = new FlxSprite();
+		var wall_corner_up = new FlxSprite();
+		var wall_corner_right = new FlxSprite();
+		var wall_corner_down = new FlxSprite();
+		var wall_side_left = new FlxSprite();
+		var wall_side_left_cut = new FlxSprite();
+		var wall_side_left_up = new FlxSprite();
+		var wall_side_up = new FlxSprite();
+		var wall_side_up_cut = new FlxSprite();
+		var wall_side_right = new FlxSprite();
+		var wall_side_right_down = new FlxSprite();
+		var wall_side_down = new FlxSprite();
 
-		stamp(mid);
+		floor_mid.loadGraphic("assets/images/floor/mid.png");
+		floor_corner_left.loadGraphic("assets/images/floor/corner_left.png");
+		floor_corner_up.loadGraphic("assets/images/floor/corner_up.png");
+		floor_corner_right.loadGraphic("assets/images/floor/corner_right.png");
+		floor_corner_down.loadGraphic("assets/images/floor/corner_down.png");
+		floor_side_left.loadGraphic("assets/images/floor/side_left.png");
+		floor_side_up.loadGraphic("assets/images/floor/side_up.png");
+		floor_side_right.loadGraphic("assets/images/floor/side_right.png");
+		floor_side_down.loadGraphic("assets/images/floor/side_down.png");
+
+		wall_corner_left.loadGraphic("assets/images/wall/corner_left.png");
+		wall_corner_up.loadGraphic("assets/images/wall/corner_up.png");
+		wall_corner_right.loadGraphic("assets/images/wall/corner_right.png");
+		wall_corner_down.loadGraphic("assets/images/wall/corner_down.png");
+		wall_side_left.loadGraphic("assets/images/wall/side_left.png");
+		wall_side_left_cut.loadGraphic("assets/images/wall/side_left_cut.png");
+		wall_side_left_up.loadGraphic("assets/images/wall/side_left_up.png");
+		wall_side_up.loadGraphic("assets/images/wall/side_up.png");
+		wall_side_up_cut.loadGraphic("assets/images/wall/side_up_cut.png");
+		wall_side_right.loadGraphic("assets/images/wall/side_right.png");
+		wall_side_right_down.loadGraphic("assets/images/wall/side_right_down.png");
+		wall_side_down.loadGraphic("assets/images/wall/side_down.png");
+
+		stamp(floor_mid, 3, 104);
 		if (EditorTile.isSelected(parent.side_down)
 			&& EditorTile.isSelected(parent.corner_left)
 			&& EditorTile.isSelected(parent.side_left))
-			stamp(corner_left);
+			stamp(floor_corner_left, 3, 104);
 		if (EditorTile.isSelected(parent.side_left) && EditorTile.isSelected(parent.corner_up) && EditorTile.isSelected(parent.side_up))
-			stamp(corner_up);
+			stamp(floor_corner_up, 3, 104);
 		if (EditorTile.isSelected(parent.side_up)
 			&& EditorTile.isSelected(parent.corner_right)
 			&& EditorTile.isSelected(parent.side_right))
-			stamp(corner_right);
+			stamp(floor_corner_right, 3, 104);
 		if (EditorTile.isSelected(parent.side_right)
 			&& EditorTile.isSelected(parent.corner_down)
 			&& EditorTile.isSelected(parent.side_down))
-			stamp(corner_down);
-		if (parent.side_left != null && parent.side_left.selected)
-			stamp(side_left);
-		if (parent.side_up != null && parent.side_up.selected)
-			stamp(side_up);
-		if (parent.side_right != null && parent.side_right.selected)
-			stamp(side_right);
-		if (parent.side_down != null && parent.side_down.selected)
-			stamp(side_down);
+			stamp(floor_corner_down, 3, 104);
+		if (EditorTile.isSelected(parent.side_left))
+			stamp(floor_side_left, 3, 104);
+		if (EditorTile.isSelected(parent.side_up))
+			stamp(floor_side_up, 3, 104);
+		if (EditorTile.isSelected(parent.side_right))
+			stamp(floor_side_right, 3, 104);
+		if (EditorTile.isSelected(parent.side_down))
+			stamp(floor_side_down, 3, 104);
 
-		mid.destroy();
-		corner_left.destroy();
-		corner_up.destroy();
-		corner_right.destroy();
-		corner_down.destroy();
-		side_left.destroy();
-		side_up.destroy();
-		side_right.destroy();
-		side_down.destroy();
+		if (!EditorTile.isSelected(parent.side_left) && !EditorTile.isSelected(parent.side_up))
+			stamp(wall_side_left_up);
+		else if (!EditorTile.isSelected(parent.side_left) && !EditorTile.isSelected(parent.corner_up))
+			stamp(wall_side_left);
+		else if (!EditorTile.isSelected(parent.side_left))
+			stamp(wall_side_left_cut);
+		else if (!EditorTile.isSelected(parent.side_up) && !EditorTile.isSelected(parent.corner_up))
+			stamp(wall_side_up);
+		else if (!EditorTile.isSelected(parent.side_up))
+			stamp(wall_side_up_cut);
+
+		if (!EditorTile.isSelected(parent.side_right) && !EditorTile.isSelected(parent.side_down))
+			stamp(wall_side_right_down);
+		else if (!EditorTile.isSelected(parent.side_right))
+			stamp(wall_side_right);
+		else if (!EditorTile.isSelected(parent.side_down))
+			stamp(wall_side_down);
+
+		if (!EditorTile.isSelected(parent.side_down) && !EditorTile.isSelected(parent.side_left))
+			stamp(wall_corner_left);
+		if (EditorTile.isSelected(parent.side_left) && !EditorTile.isSelected(parent.corner_up) && EditorTile.isSelected(parent.side_up))
+			stamp(wall_corner_up);
+		if (!EditorTile.isSelected(parent.side_up) && !EditorTile.isSelected(parent.side_right))
+			stamp(wall_corner_right);
+		if (EditorTile.isSelected(parent.side_right)
+			&& !EditorTile.isSelected(parent.corner_down)
+			&& EditorTile.isSelected(parent.side_down))
+			stamp(wall_corner_down);
+
+		floor_mid.destroy();
+		floor_corner_left.destroy();
+		floor_corner_up.destroy();
+		floor_corner_right.destroy();
+		floor_corner_down.destroy();
+		floor_side_left.destroy();
+		floor_side_up.destroy();
+		floor_side_right.destroy();
+		floor_side_down.destroy();
+
+		wall_corner_left.destroy();
+		wall_corner_up.destroy();
+		wall_corner_right.destroy();
+		wall_corner_down.destroy();
+		wall_side_left.destroy();
+		wall_side_left_up.destroy();
+		wall_side_up.destroy();
+		wall_side_right.destroy();
+		wall_side_right_down.destroy();
+		wall_side_down.destroy();
 	}
 }
