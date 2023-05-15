@@ -1,7 +1,13 @@
+import flixel.system.FlxAssets;
+import openfl.geom.Point;
+import openfl.display.BitmapData;
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
 
 class RoomTile extends FlxSprite {
+	public static var FLOOR_MID:BitmapData;
+	static var floor_point:Point = new Point(3, 104);
+
 	var parent:EditorTile;
 
 	public function new(x:Float, y:Float, parent:EditorTile) {
@@ -13,7 +19,6 @@ class RoomTile extends FlxSprite {
 	public function updateGraphics() {
 		makeGraphic(51, 127, FlxColor.TRANSPARENT, true);
 
-		var floor_mid = new FlxSprite();
 		var floor_corner_left = new FlxSprite();
 		var floor_corner_up = new FlxSprite();
 		var floor_corner_right = new FlxSprite();
@@ -36,7 +41,6 @@ class RoomTile extends FlxSprite {
 		var wall_side_right_down = new FlxSprite();
 		var wall_side_down = new FlxSprite();
 
-		floor_mid.loadGraphic("assets/images/floor/mid.png");
 		floor_corner_left.loadGraphic("assets/images/floor/corner_left.png");
 		floor_corner_up.loadGraphic("assets/images/floor/corner_up.png");
 		floor_corner_right.loadGraphic("assets/images/floor/corner_right.png");
@@ -59,7 +63,8 @@ class RoomTile extends FlxSprite {
 		wall_side_right_down.loadGraphic("assets/images/wall/side_right_down.png");
 		wall_side_down.loadGraphic("assets/images/wall/side_down.png");
 
-		stamp(floor_mid, 3, 104);
+		trace(FLOOR_MID);
+		this.graphic.bitmap.copyPixels(FLOOR_MID, FLOOR_MID.rect, floor_point);
 		if (EditorTile.isSelected(parent.side_down)
 			&& EditorTile.isSelected(parent.corner_left)
 			&& EditorTile.isSelected(parent.side_left))
@@ -112,7 +117,6 @@ class RoomTile extends FlxSprite {
 			&& EditorTile.isSelected(parent.side_down))
 			stamp(wall_corner_down);
 
-		floor_mid.destroy();
 		floor_corner_left.destroy();
 		floor_corner_up.destroy();
 		floor_corner_right.destroy();
