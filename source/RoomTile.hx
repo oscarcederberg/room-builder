@@ -1,12 +1,37 @@
+import flixel.FlxSprite;
+import flixel.util.FlxColor;
 import flixel.system.FlxAssets;
 import openfl.geom.Point;
 import openfl.display.BitmapData;
-import flixel.FlxSprite;
-import flixel.util.FlxColor;
+
+enum Fragment {
+	FLOOR_MID;
+	FLOOR_CORNER_LEFT;
+	FLOOR_CORNER_UP;
+	FLOOR_CORNER_RIGHT;
+	FLOOR_CORNER_DOWN;
+	FLOOR_SIDE_LEFT;
+	FLOOR_SIDE_UP;
+	FLOOR_SIDE_RIGHT;
+	FLOOR_SIDE_DOWN;
+	WALL_CORNER_LEFT;
+	WALL_CORNER_UP;
+	WALL_CORNER_RIGHT;
+	WALL_CORNER_DOWN;
+	WALL_SIDE_LEFT;
+	WALL_SIDE_LEFT_CUT;
+	WALL_SIDE_LEFT_UP;
+	WALL_SIDE_UP;
+	WALL_SIDE_UP_CUT;
+	WALL_SIDE_RIGHT;
+	WALL_SIDE_RIGHT_DOWN;
+	WALL_SIDE_DOWN;
+}
 
 class RoomTile extends FlxSprite {
-	public static var FLOOR_MID:BitmapData;
-	static var floor_point:Point = new Point(3, 104);
+	public static var bitmaps:haxe.ds.Map<Fragment, BitmapData> = new Map();
+	public static var floor_point:Point = new Point(3, 104);
+	public static var wall_point:Point = new Point(0, 0);
 
 	var parent:EditorTile;
 
@@ -16,125 +41,91 @@ class RoomTile extends FlxSprite {
 		this.parent = parent;
 	}
 
+	public function stampFragment(fragment: Fragment) {
+		this.graphic.bitmap.copyPixels(bitmaps[fragment], bitmaps[fragment].rect,
+			fragment.getIndex() < WALL_CORNER_LEFT.getIndex() ? floor_point : wall_point,
+			null, null, true
+		);
+	}
+
 	public function updateGraphics() {
 		makeGraphic(51, 127, FlxColor.TRANSPARENT, true);
 
-		var floor_corner_left = new FlxSprite();
-		var floor_corner_up = new FlxSprite();
-		var floor_corner_right = new FlxSprite();
-		var floor_corner_down = new FlxSprite();
-		var floor_side_left = new FlxSprite();
-		var floor_side_up = new FlxSprite();
-		var floor_side_right = new FlxSprite();
-		var floor_side_down = new FlxSprite();
+		stampFragment(FLOOR_MID);
+		if (parent.isNeighbourSelected(SIDE_DOWN)
+			&& parent.isNeighbourSelected(CORNER_LEFT)
+			&& parent.isNeighbourSelected(SIDE_LEFT))
+			stampFragment(FLOOR_CORNER_LEFT);
+		if (parent.isNeighbourSelected(SIDE_LEFT)
+			&& parent.isNeighbourSelected(CORNER_UP)
+			&& parent.isNeighbourSelected(SIDE_UP))
+			stampFragment(FLOOR_CORNER_UP);
+		if (parent.isNeighbourSelected(SIDE_UP)
+			&& parent.isNeighbourSelected(CORNER_RIGHT)
+			&& parent.isNeighbourSelected(SIDE_RIGHT))
+			stampFragment(FLOOR_CORNER_RIGHT);
+		if (parent.isNeighbourSelected(SIDE_RIGHT)
+			&& parent.isNeighbourSelected(CORNER_DOWN)
+			&& parent.isNeighbourSelected(SIDE_DOWN))
+			stampFragment(FLOOR_CORNER_DOWN);
+		if (parent.isNeighbourSelected(SIDE_LEFT))
+			stampFragment(FLOOR_SIDE_LEFT);
+		if (parent.isNeighbourSelected(SIDE_UP))
+			stampFragment(FLOOR_SIDE_UP);
+		if (parent.isNeighbourSelected(SIDE_RIGHT))
+			stampFragment(FLOOR_SIDE_RIGHT);
+		if (parent.isNeighbourSelected(SIDE_DOWN))
+			stampFragment(FLOOR_SIDE_DOWN);
 
-		var wall_corner_left = new FlxSprite();
-		var wall_corner_up = new FlxSprite();
-		var wall_corner_right = new FlxSprite();
-		var wall_corner_down = new FlxSprite();
-		var wall_side_left = new FlxSprite();
-		var wall_side_left_cut = new FlxSprite();
-		var wall_side_left_up = new FlxSprite();
-		var wall_side_up = new FlxSprite();
-		var wall_side_up_cut = new FlxSprite();
-		var wall_side_right = new FlxSprite();
-		var wall_side_right_down = new FlxSprite();
-		var wall_side_down = new FlxSprite();
+		if (!parent.isNeighbourSelected(SIDE_LEFT)
+			&& !parent.isNeighbourSelected(SIDE_UP))
+			stampFragment(WALL_SIDE_LEFT_UP);
+		else if (!parent.isNeighbourSelected(SIDE_LEFT)
+			&& !parent.isNeighbourSelected(CORNER_UP))
+			stampFragment(WALL_SIDE_LEFT);
+		else if (!parent.isNeighbourSelected(SIDE_LEFT))
+			stampFragment(WALL_SIDE_LEFT_CUT);
+		else if (!parent.isNeighbourSelected(SIDE_UP)
+			&& !parent.isNeighbourSelected(CORNER_UP))
+			stampFragment(WALL_SIDE_UP);
+		else if (!parent.isNeighbourSelected(SIDE_UP))
+			stampFragment(WALL_SIDE_UP_CUT);
 
-		floor_corner_left.loadGraphic("assets/images/floor/corner_left.png");
-		floor_corner_up.loadGraphic("assets/images/floor/corner_up.png");
-		floor_corner_right.loadGraphic("assets/images/floor/corner_right.png");
-		floor_corner_down.loadGraphic("assets/images/floor/corner_down.png");
-		floor_side_left.loadGraphic("assets/images/floor/side_left.png");
-		floor_side_up.loadGraphic("assets/images/floor/side_up.png");
-		floor_side_right.loadGraphic("assets/images/floor/side_right.png");
-		floor_side_down.loadGraphic("assets/images/floor/side_down.png");
+		if (!parent.isNeighbourSelected(SIDE_RIGHT)
+			&& !parent.isNeighbourSelected(SIDE_DOWN))
+			stampFragment(WALL_SIDE_RIGHT_DOWN);
+		else if (!parent.isNeighbourSelected(SIDE_RIGHT))
+			stampFragment(WALL_SIDE_RIGHT);
+		else if (!parent.isNeighbourSelected(SIDE_DOWN))
+			stampFragment(WALL_SIDE_DOWN);
 
-		wall_corner_left.loadGraphic("assets/images/wall/corner_left.png");
-		wall_corner_up.loadGraphic("assets/images/wall/corner_up.png");
-		wall_corner_right.loadGraphic("assets/images/wall/corner_right.png");
-		wall_corner_down.loadGraphic("assets/images/wall/corner_down.png");
-		wall_side_left.loadGraphic("assets/images/wall/side_left.png");
-		wall_side_left_cut.loadGraphic("assets/images/wall/side_left_cut.png");
-		wall_side_left_up.loadGraphic("assets/images/wall/side_left_up.png");
-		wall_side_up.loadGraphic("assets/images/wall/side_up.png");
-		wall_side_up_cut.loadGraphic("assets/images/wall/side_up_cut.png");
-		wall_side_right.loadGraphic("assets/images/wall/side_right.png");
-		wall_side_right_down.loadGraphic("assets/images/wall/side_right_down.png");
-		wall_side_down.loadGraphic("assets/images/wall/side_down.png");
+		if (!parent.isNeighbourSelected(SIDE_DOWN)
+			&& !parent.isNeighbourSelected(SIDE_LEFT))
+			stampFragment(WALL_CORNER_LEFT);
+		if (parent.isNeighbourSelected(SIDE_LEFT)
+			&& !parent.isNeighbourSelected(CORNER_UP)
+			&& parent.isNeighbourSelected(SIDE_UP))
+			stampFragment(WALL_CORNER_UP);
+		if (!parent.isNeighbourSelected(SIDE_UP)
+			&& !parent.isNeighbourSelected(SIDE_RIGHT))
+			stampFragment(WALL_CORNER_RIGHT);
+		if (parent.isNeighbourSelected(SIDE_RIGHT)
+			&& !parent.isNeighbourSelected(CORNER_DOWN)
+			&& parent.isNeighbourSelected(SIDE_DOWN))
+		stampFragment(WALL_CORNER_DOWN);
+	}
 
-		trace(FLOOR_MID);
-		this.graphic.bitmap.copyPixels(FLOOR_MID, FLOOR_MID.rect, floor_point);
-		if (EditorTile.isSelected(parent.side_down)
-			&& EditorTile.isSelected(parent.corner_left)
-			&& EditorTile.isSelected(parent.side_left))
-			stamp(floor_corner_left, 3, 104);
-		if (EditorTile.isSelected(parent.side_left) && EditorTile.isSelected(parent.corner_up) && EditorTile.isSelected(parent.side_up))
-			stamp(floor_corner_up, 3, 104);
-		if (EditorTile.isSelected(parent.side_up)
-			&& EditorTile.isSelected(parent.corner_right)
-			&& EditorTile.isSelected(parent.side_right))
-			stamp(floor_corner_right, 3, 104);
-		if (EditorTile.isSelected(parent.side_right)
-			&& EditorTile.isSelected(parent.corner_down)
-			&& EditorTile.isSelected(parent.side_down))
-			stamp(floor_corner_down, 3, 104);
-		if (EditorTile.isSelected(parent.side_left))
-			stamp(floor_side_left, 3, 104);
-		if (EditorTile.isSelected(parent.side_up))
-			stamp(floor_side_up, 3, 104);
-		if (EditorTile.isSelected(parent.side_right))
-			stamp(floor_side_right, 3, 104);
-		if (EditorTile.isSelected(parent.side_down))
-			stamp(floor_side_down, 3, 104);
+	public static function loadFragmentAsset(fragment:Fragment, asset:String) {
+		bitmaps[fragment] = FlxAssets.getBitmapData(asset);
+	}
 
-		if (!EditorTile.isSelected(parent.side_left) && !EditorTile.isSelected(parent.side_up))
-			stamp(wall_side_left_up);
-		else if (!EditorTile.isSelected(parent.side_left) && !EditorTile.isSelected(parent.corner_up))
-			stamp(wall_side_left);
-		else if (!EditorTile.isSelected(parent.side_left))
-			stamp(wall_side_left_cut);
-		else if (!EditorTile.isSelected(parent.side_up) && !EditorTile.isSelected(parent.corner_up))
-			stamp(wall_side_up);
-		else if (!EditorTile.isSelected(parent.side_up))
-			stamp(wall_side_up_cut);
+	public static function loadAllFragmentAssets() {
+		for (frag in Fragment.createAll()) {
+			var name = frag.getName().toLowerCase();
+			var split = name.indexOf("_");
+			var asset = 'assets/images/${name.substring(0, split)}/${name.substring(split + 1)}.png';
 
-		if (!EditorTile.isSelected(parent.side_right) && !EditorTile.isSelected(parent.side_down))
-			stamp(wall_side_right_down);
-		else if (!EditorTile.isSelected(parent.side_right))
-			stamp(wall_side_right);
-		else if (!EditorTile.isSelected(parent.side_down))
-			stamp(wall_side_down);
-
-		if (!EditorTile.isSelected(parent.side_down) && !EditorTile.isSelected(parent.side_left))
-			stamp(wall_corner_left);
-		if (EditorTile.isSelected(parent.side_left) && !EditorTile.isSelected(parent.corner_up) && EditorTile.isSelected(parent.side_up))
-			stamp(wall_corner_up);
-		if (!EditorTile.isSelected(parent.side_up) && !EditorTile.isSelected(parent.side_right))
-			stamp(wall_corner_right);
-		if (EditorTile.isSelected(parent.side_right)
-			&& !EditorTile.isSelected(parent.corner_down)
-			&& EditorTile.isSelected(parent.side_down))
-			stamp(wall_corner_down);
-
-		floor_corner_left.destroy();
-		floor_corner_up.destroy();
-		floor_corner_right.destroy();
-		floor_corner_down.destroy();
-		floor_side_left.destroy();
-		floor_side_up.destroy();
-		floor_side_right.destroy();
-		floor_side_down.destroy();
-
-		wall_corner_left.destroy();
-		wall_corner_up.destroy();
-		wall_corner_right.destroy();
-		wall_corner_down.destroy();
-		wall_side_left.destroy();
-		wall_side_left_up.destroy();
-		wall_side_up.destroy();
-		wall_side_right.destroy();
-		wall_side_right_down.destroy();
-		wall_side_down.destroy();
+			loadFragmentAsset(frag, asset);
+		}
 	}
 }

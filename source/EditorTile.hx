@@ -2,18 +2,22 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.util.FlxCollision;
 
+enum Neighbour {
+	CORNER_LEFT;
+	CORNER_UP;
+	CORNER_RIGHT;
+	CORNER_DOWN;
+	SIDE_LEFT;
+	SIDE_UP;
+	SIDE_RIGHT;
+	SIDE_DOWN;
+}
+
 class EditorTile extends FlxSprite {
 	public var selected:Bool;
-	public var corner_left:EditorTile;
-	public var corner_up:EditorTile;
-	public var corner_right:EditorTile;
-	public var corner_down:EditorTile;
-	public var side_left:EditorTile;
-	public var side_up:EditorTile;
-	public var side_right:EditorTile;
-	public var side_down:EditorTile;
 
 	var parent:PlayState = cast(FlxG.state, PlayState);
+	var neighbours:Map<Neighbour, EditorTile> = new Map();
 	var room_tile:RoomTile;
 
 	public var row:Int;
@@ -48,32 +52,32 @@ class EditorTile extends FlxSprite {
 		animation.play("unselected");
 	}
 
-	public static function isSelected(tile:EditorTile):Bool {
-		return tile != null && tile.selected;
+	public function isNeighbourSelected(neighbour:Neighbour):Bool {
+		return neighbours[neighbour] != null && neighbours[neighbour].selected;
 	}
 
 	public function populateNeighbours() {
 		if (col > 0)
-			corner_left = parent.editor_tiles_vec[col - 1][row];
-		corner_up = parent.editor_tiles_vec[col][row - 2];
+			neighbours[CORNER_LEFT] = parent.editor_tiles_vec[col - 1][row];
+		neighbours[CORNER_UP] = parent.editor_tiles_vec[col][row - 2];
 		if (col < PlayState.TILES_COLS - 1)
-			corner_right = parent.editor_tiles_vec[col + 1][row];
-		corner_down = parent.editor_tiles_vec[col][row + 2];
+			neighbours[CORNER_RIGHT] = parent.editor_tiles_vec[col + 1][row];
+		neighbours[CORNER_DOWN] = parent.editor_tiles_vec[col][row + 2];
 
 		if (row % 2 == 0) {
 			if (col > 0)
-				side_left = parent.editor_tiles_vec[col - 1][row - 1];
-			side_up = parent.editor_tiles_vec[col][row - 1];
-			side_right = parent.editor_tiles_vec[col][row + 1];
+				neighbours[SIDE_LEFT] = parent.editor_tiles_vec[col - 1][row - 1];
+			neighbours[SIDE_UP] = parent.editor_tiles_vec[col][row - 1];
+			neighbours[SIDE_RIGHT] = parent.editor_tiles_vec[col][row + 1];
 			if (col > 0)
-				side_down = parent.editor_tiles_vec[col - 1][row + 1];
+				neighbours[SIDE_DOWN] = parent.editor_tiles_vec[col - 1][row + 1];
 		} else {
-			side_left = parent.editor_tiles_vec[col][row - 1];
+			neighbours[SIDE_LEFT] = parent.editor_tiles_vec[col][row - 1];
 			if (col < PlayState.TILES_COLS - 1)
-				side_up = parent.editor_tiles_vec[col + 1][row - 1];
+				neighbours[SIDE_UP] = parent.editor_tiles_vec[col + 1][row - 1];
 			if (col < PlayState.TILES_COLS - 1)
-				side_right = parent.editor_tiles_vec[col + 1][row + 1];
-			side_down = parent.editor_tiles_vec[col][row + 1];
+				neighbours[SIDE_RIGHT] = parent.editor_tiles_vec[col + 1][row + 1];
+			neighbours[SIDE_DOWN] = parent.editor_tiles_vec[col][row + 1];
 		}
 	}
 
@@ -106,22 +110,9 @@ class EditorTile extends FlxSprite {
 	}
 
 	function selectNeighbours() {
-		if (isSelected(corner_left))
-			corner_left.select();
-		if (isSelected(corner_up))
-			corner_up.select();
-		if (isSelected(corner_right))
-			corner_right.select();
-		if (isSelected(corner_down))
-			corner_down.select();
-		if (isSelected(side_left))
-			side_left.select();
-		if (isSelected(side_up))
-			side_up.select();
-		if (isSelected(side_right))
-			side_right.select();
-		if (isSelected(side_down))
-			side_down.select();
+		for (neighbour in neighbours.keys())
+			if (isNeighbourSelected(neighbour))
+				neighbours[neighbour].select();
 	}
 
 	function animate() {
