@@ -33,12 +33,15 @@ class RoomTile extends FlxSprite {
 	public static var floor_point:Point = new Point(3, 104);
 	public static var wall_point:Point = new Point(0, 0);
 
+	public var room_index:Int;
+
 	var parent:EditorTile;
 
 	public function new(x:Float, y:Float, parent:EditorTile) {
 		super(x, y);
 
 		this.parent = parent;
+		this.room_index = 0;
 	}
 
 	public function stampFragment(fragment:Fragment) {

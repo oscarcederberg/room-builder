@@ -51,7 +51,11 @@ class EditorTile extends FlxSprite {
 	}
 
 	public function isNeighbourSelected(neighbour:Neighbour):Bool {
-		return neighbours[neighbour] != null && neighbours[neighbour].selected;
+		return neighbours[neighbour] != null && neighbours[neighbour].selected && neighbours[neighbour].getRoomIndex() == getRoomIndex();
+	}
+
+	public function getRoomIndex():Int {
+		return room_tile.room_index;
 	}
 
 	public function populateNeighbours() {
@@ -83,6 +87,7 @@ class EditorTile extends FlxSprite {
 				room_tile.visible = true;
 				this.visible = false;
 
+				room_tile.room_index = parent.room_index;
 				select();
 			} else {
 				selected = false;

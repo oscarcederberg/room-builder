@@ -13,6 +13,9 @@ class PlayState extends FlxState {
 	public var editor_tiles_vec:Vector<Vector<EditorTile>>;
 	public var room_tiles:FlxTypedGroup<RoomTile>;
 
+	public var ui:UI;
+	public var room_index:Int;
+
 	override public function create() {
 		super.create();
 
@@ -43,6 +46,11 @@ class PlayState extends FlxState {
 
 		add(editor_tiles);
 		add(room_tiles);
+
+		this.ui = new UI(this);
+		this.room_index = 0;
+
+		add(ui);
 	}
 
 	public function getEditorTile(col:Int, row:Int) {
@@ -55,6 +63,18 @@ class PlayState extends FlxState {
 		if (FlxG.mouse.pressedMiddle && !FlxG.mouse.justPressedMiddle) {
 			FlxG.camera.scroll.x -= FlxG.mouse.deltaScreenX;
 			FlxG.camera.scroll.y -= FlxG.mouse.deltaScreenY;
+		}
+
+		if (FlxG.mouse.wheel > 0) {
+			room_index += 1;
+		} else if (FlxG.mouse.wheel < 0) {
+			room_index -= 1;
+		}
+
+		if (room_index > 8) {
+			room_index = 0;
+		} else if (room_index < 0) {
+			room_index = 8;
 		}
 
 		super.update(elapsed);
