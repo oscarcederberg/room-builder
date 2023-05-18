@@ -14,10 +14,9 @@ enum Neighbour {
 }
 
 class EditorTile extends FlxSprite {
-	public var selected:Bool;
-
-	public var row:Int;
 	public var col:Int;
+	public var row:Int;
+	public var selected:Bool;
 
 	var parent:PlayState = cast(FlxG.state, PlayState);
 	var neighbours:Map<Neighbour, EditorTile> = new Map();
@@ -26,6 +25,8 @@ class EditorTile extends FlxSprite {
 
 	public function new(col:Int, row:Int) {
 		var x, y:Float;
+		this.col = col;
+		this.row = row;
 
 		if (row % 2 == 0) {
 			x = 48 * col;
@@ -36,8 +37,6 @@ class EditorTile extends FlxSprite {
 
 		super(x, y);
 
-		this.col = col;
-		this.row = row;
 		hovering = false;
 		selected = false;
 
@@ -85,14 +84,13 @@ class EditorTile extends FlxSprite {
 				this.visible = false;
 
 				select();
-				selectNeighbours();
 			} else {
 				selected = false;
 				room_tile.visible = false;
 				this.visible = true;
-
-				selectNeighbours();
 			}
+
+			selectNeighbours();
 		}
 
 		animate();

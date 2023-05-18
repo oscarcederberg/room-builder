@@ -1,8 +1,8 @@
 import flixel.FlxSprite;
-import flixel.util.FlxColor;
 import flixel.system.FlxAssets;
-import openfl.geom.Point;
+import flixel.util.FlxColor;
 import openfl.display.BitmapData;
+import openfl.geom.Point;
 
 enum Fragment {
 	FLOOR_MID;
@@ -41,32 +41,22 @@ class RoomTile extends FlxSprite {
 		this.parent = parent;
 	}
 
-	public function stampFragment(fragment: Fragment) {
+	public function stampFragment(fragment:Fragment) {
 		this.graphic.bitmap.copyPixels(bitmaps[fragment], bitmaps[fragment].rect,
-			fragment.getIndex() < WALL_CORNER_LEFT.getIndex() ? floor_point : wall_point,
-			null, null, true
-		);
+			fragment.getIndex() < WALL_CORNER_LEFT.getIndex() ? floor_point : wall_point, null, null, true);
 	}
 
 	public function updateGraphics() {
 		makeGraphic(51, 127, FlxColor.TRANSPARENT, true);
 
 		stampFragment(FLOOR_MID);
-		if (parent.isNeighbourSelected(SIDE_DOWN)
-			&& parent.isNeighbourSelected(CORNER_LEFT)
-			&& parent.isNeighbourSelected(SIDE_LEFT))
+		if (parent.isNeighbourSelected(SIDE_DOWN) && parent.isNeighbourSelected(CORNER_LEFT) && parent.isNeighbourSelected(SIDE_LEFT))
 			stampFragment(FLOOR_CORNER_LEFT);
-		if (parent.isNeighbourSelected(SIDE_LEFT)
-			&& parent.isNeighbourSelected(CORNER_UP)
-			&& parent.isNeighbourSelected(SIDE_UP))
+		if (parent.isNeighbourSelected(SIDE_LEFT) && parent.isNeighbourSelected(CORNER_UP) && parent.isNeighbourSelected(SIDE_UP))
 			stampFragment(FLOOR_CORNER_UP);
-		if (parent.isNeighbourSelected(SIDE_UP)
-			&& parent.isNeighbourSelected(CORNER_RIGHT)
-			&& parent.isNeighbourSelected(SIDE_RIGHT))
+		if (parent.isNeighbourSelected(SIDE_UP) && parent.isNeighbourSelected(CORNER_RIGHT) && parent.isNeighbourSelected(SIDE_RIGHT))
 			stampFragment(FLOOR_CORNER_RIGHT);
-		if (parent.isNeighbourSelected(SIDE_RIGHT)
-			&& parent.isNeighbourSelected(CORNER_DOWN)
-			&& parent.isNeighbourSelected(SIDE_DOWN))
+		if (parent.isNeighbourSelected(SIDE_RIGHT) && parent.isNeighbourSelected(CORNER_DOWN) && parent.isNeighbourSelected(SIDE_DOWN))
 			stampFragment(FLOOR_CORNER_DOWN);
 		if (parent.isNeighbourSelected(SIDE_LEFT))
 			stampFragment(FLOOR_SIDE_LEFT);
@@ -77,42 +67,32 @@ class RoomTile extends FlxSprite {
 		if (parent.isNeighbourSelected(SIDE_DOWN))
 			stampFragment(FLOOR_SIDE_DOWN);
 
-		if (!parent.isNeighbourSelected(SIDE_LEFT)
-			&& !parent.isNeighbourSelected(SIDE_UP))
+		if (!parent.isNeighbourSelected(SIDE_LEFT) && !parent.isNeighbourSelected(SIDE_UP))
 			stampFragment(WALL_SIDE_LEFT_UP);
-		else if (!parent.isNeighbourSelected(SIDE_LEFT)
-			&& !parent.isNeighbourSelected(CORNER_UP))
+		else if (!parent.isNeighbourSelected(SIDE_LEFT) && !parent.isNeighbourSelected(CORNER_UP))
 			stampFragment(WALL_SIDE_LEFT);
 		else if (!parent.isNeighbourSelected(SIDE_LEFT))
 			stampFragment(WALL_SIDE_LEFT_CUT);
-		else if (!parent.isNeighbourSelected(SIDE_UP)
-			&& !parent.isNeighbourSelected(CORNER_UP))
+		else if (!parent.isNeighbourSelected(SIDE_UP) && !parent.isNeighbourSelected(CORNER_UP))
 			stampFragment(WALL_SIDE_UP);
 		else if (!parent.isNeighbourSelected(SIDE_UP))
 			stampFragment(WALL_SIDE_UP_CUT);
 
-		if (!parent.isNeighbourSelected(SIDE_RIGHT)
-			&& !parent.isNeighbourSelected(SIDE_DOWN))
+		if (!parent.isNeighbourSelected(SIDE_RIGHT) && !parent.isNeighbourSelected(SIDE_DOWN))
 			stampFragment(WALL_SIDE_RIGHT_DOWN);
 		else if (!parent.isNeighbourSelected(SIDE_RIGHT))
 			stampFragment(WALL_SIDE_RIGHT);
 		else if (!parent.isNeighbourSelected(SIDE_DOWN))
 			stampFragment(WALL_SIDE_DOWN);
 
-		if (!parent.isNeighbourSelected(SIDE_DOWN)
-			&& !parent.isNeighbourSelected(SIDE_LEFT))
+		if (!parent.isNeighbourSelected(SIDE_DOWN) && !parent.isNeighbourSelected(SIDE_LEFT))
 			stampFragment(WALL_CORNER_LEFT);
-		if (parent.isNeighbourSelected(SIDE_LEFT)
-			&& !parent.isNeighbourSelected(CORNER_UP)
-			&& parent.isNeighbourSelected(SIDE_UP))
+		if (parent.isNeighbourSelected(SIDE_LEFT) && !parent.isNeighbourSelected(CORNER_UP) && parent.isNeighbourSelected(SIDE_UP))
 			stampFragment(WALL_CORNER_UP);
-		if (!parent.isNeighbourSelected(SIDE_UP)
-			&& !parent.isNeighbourSelected(SIDE_RIGHT))
+		if (!parent.isNeighbourSelected(SIDE_UP) && !parent.isNeighbourSelected(SIDE_RIGHT))
 			stampFragment(WALL_CORNER_RIGHT);
-		if (parent.isNeighbourSelected(SIDE_RIGHT)
-			&& !parent.isNeighbourSelected(CORNER_DOWN)
-			&& parent.isNeighbourSelected(SIDE_DOWN))
-		stampFragment(WALL_CORNER_DOWN);
+		if (parent.isNeighbourSelected(SIDE_RIGHT) && !parent.isNeighbourSelected(CORNER_DOWN) && parent.isNeighbourSelected(SIDE_DOWN))
+			stampFragment(WALL_CORNER_DOWN);
 	}
 
 	public static function loadFragmentAsset(fragment:Fragment, asset:String) {

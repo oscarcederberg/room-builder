@@ -20,10 +20,12 @@ class PlayState extends FlxState {
 
 		this.editor_tiles = new FlxTypedGroup<EditorTile>();
 		this.editor_tiles_vec = new Vector<Vector<EditorTile>>(TILES_COLS);
+		this.room_tiles = new FlxTypedGroup<RoomTile>();
+
 		for (col in 0...TILES_COLS) {
 			this.editor_tiles_vec[col] = new Vector<EditorTile>(TILES_ROWS);
 		}
-		this.room_tiles = new FlxTypedGroup<RoomTile>();
+
 		var editor_tile:EditorTile;
 		for (row in 0...TILES_ROWS) {
 			for (col in 0...TILES_COLS) {
@@ -32,11 +34,13 @@ class PlayState extends FlxState {
 				this.editor_tiles_vec[col][row] = editor_tile;
 			}
 		}
+
 		for (row in 0...TILES_ROWS) {
 			for (col in 0...TILES_COLS) {
 				this.editor_tiles_vec[col][row].populateNeighbours();
 			}
 		}
+
 		add(editor_tiles);
 		add(room_tiles);
 	}
