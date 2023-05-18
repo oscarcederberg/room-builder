@@ -16,13 +16,12 @@ enum Neighbour {
 class EditorTile extends FlxSprite {
 	public var selected:Bool;
 
-	var parent:PlayState = cast(FlxG.state, PlayState);
-	var neighbours:Map<Neighbour, EditorTile> = new Map();
-	var room_tile:RoomTile;
-
 	public var row:Int;
 	public var col:Int;
 
+	var parent:PlayState = cast(FlxG.state, PlayState);
+	var neighbours:Map<Neighbour, EditorTile> = new Map();
+	var room_tile:RoomTile;
 	var hovering:Bool;
 
 	public function new(col:Int, row:Int) {
@@ -57,27 +56,21 @@ class EditorTile extends FlxSprite {
 	}
 
 	public function populateNeighbours() {
-		if (col > 0)
-			neighbours[CORNER_LEFT] = parent.editor_tiles_vec[col - 1][row];
-		neighbours[CORNER_UP] = parent.editor_tiles_vec[col][row - 2];
-		if (col < PlayState.TILES_COLS - 1)
-			neighbours[CORNER_RIGHT] = parent.editor_tiles_vec[col + 1][row];
-		neighbours[CORNER_DOWN] = parent.editor_tiles_vec[col][row + 2];
+		neighbours[CORNER_LEFT] = parent.getEditorTile(col - 1, row);
+		neighbours[CORNER_UP] = parent.getEditorTile(col, row - 2);
+		neighbours[CORNER_RIGHT] = parent.getEditorTile(col + 1, row);
+		neighbours[CORNER_DOWN] = parent.getEditorTile(col, row + 2);
 
 		if (row % 2 == 0) {
-			if (col > 0)
-				neighbours[SIDE_LEFT] = parent.editor_tiles_vec[col - 1][row - 1];
-			neighbours[SIDE_UP] = parent.editor_tiles_vec[col][row - 1];
-			neighbours[SIDE_RIGHT] = parent.editor_tiles_vec[col][row + 1];
-			if (col > 0)
-				neighbours[SIDE_DOWN] = parent.editor_tiles_vec[col - 1][row + 1];
+			neighbours[SIDE_LEFT] = parent.getEditorTile(col - 1, row - 1);
+			neighbours[SIDE_UP] = parent.getEditorTile(col, row - 1);
+			neighbours[SIDE_RIGHT] = parent.getEditorTile(col, row + 1);
+			neighbours[SIDE_DOWN] = parent.getEditorTile(col - 1, row + 1);
 		} else {
-			neighbours[SIDE_LEFT] = parent.editor_tiles_vec[col][row - 1];
-			if (col < PlayState.TILES_COLS - 1)
-				neighbours[SIDE_UP] = parent.editor_tiles_vec[col + 1][row - 1];
-			if (col < PlayState.TILES_COLS - 1)
-				neighbours[SIDE_RIGHT] = parent.editor_tiles_vec[col + 1][row + 1];
-			neighbours[SIDE_DOWN] = parent.editor_tiles_vec[col][row + 1];
+			neighbours[SIDE_LEFT] = parent.getEditorTile(col, row - 1);
+			neighbours[SIDE_UP] = parent.getEditorTile(col + 1, row - 1);
+			neighbours[SIDE_RIGHT] = parent.getEditorTile(col + 1, row + 1);
+			neighbours[SIDE_DOWN] = parent.getEditorTile(col, row + 1);
 		}
 	}
 
@@ -85,19 +78,21 @@ class EditorTile extends FlxSprite {
 		var mouse_pos = FlxG.mouse.getWorldPosition();
 		hovering = FlxCollision.pixelPerfectPointCheck(Std.int(mouse_pos.x), Std.int(mouse_pos.y), this);
 
-		if (hovering && !selected && FlxG.mouse.justPressed) {
-			selected = true;
-			room_tile.visible = true;
-			this.visible = false;
+		if (FlxG.mouse.justPressed && hovering) {
+			if (!selected) {
+				selected = true;
+				room_tile.visible = true;
+				this.visible = false;
 
-			select();
-			selectNeighbours();
-		} else if (hovering && selected && FlxG.mouse.justPressed) {
-			selected = false;
-			room_tile.visible = false;
-			this.visible = true;
+				select();
+				selectNeighbours();
+			} else {
+				selected = false;
+				room_tile.visible = false;
+				this.visible = true;
 
-			selectNeighbours();
+				selectNeighbours();
+			}
 		}
 
 		animate();

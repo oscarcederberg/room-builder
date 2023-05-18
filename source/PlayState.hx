@@ -41,6 +41,12 @@ class PlayState extends FlxState {
 		add(room_tiles);
 	}
 
+	public function getEditorTile(col:Int, row:Int) {
+		if (editor_tiles_vec[col] != null)
+			return editor_tiles_vec[col][row];
+		return null;
+	}
+
 	override public function update(elapsed:Float) {
 		if (FlxG.mouse.pressedMiddle && !FlxG.mouse.justPressedMiddle) {
 			FlxG.camera.scroll.x -= FlxG.mouse.deltaScreenX;
