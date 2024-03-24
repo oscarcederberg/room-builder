@@ -6,8 +6,8 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import haxe.ds.Vector;
 
 class PlayState extends FlxState {
-	public static inline var TILES_COLS = 10;
-	public static inline var TILES_ROWS = 40;
+	public static inline var TILES_COLS = 15;
+	public static inline var TILES_ROWS = 15;
 
 	public var editor_tiles:FlxTypedGroup<EditorTile>;
 	public var editor_tiles_vec:Vector<Vector<EditorTile>>;

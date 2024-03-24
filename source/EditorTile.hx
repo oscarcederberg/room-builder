@@ -1,6 +1,5 @@
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.util.FlxCollision;
 
 enum Neighbour {
 	CORNER_LEFT;
@@ -14,6 +13,9 @@ enum Neighbour {
 }
 
 class EditorTile extends FlxSprite {
+	public static final EDITOR_WIDTH = 48;
+	public static final EDITOR_HEIGHT = 16;
+
 	public var col:Int;
 	public var row:Int;
 	public var selected:Bool;
@@ -28,12 +30,8 @@ class EditorTile extends FlxSprite {
 		this.col = col;
 		this.row = row;
 
-		if (row % 2 == 0) {
-			x = 48 * col;
-		} else {
-			x = 48 * col + 24;
-		}
-		y = 8 * row;
+		x = col * EDITOR_WIDTH / 2 + (row * -EDITOR_WIDTH / 2);
+		y = row * EDITOR_HEIGHT / 2 + (col * EDITOR_HEIGHT / 2);
 
 		super(x, y);
 
@@ -59,27 +57,19 @@ class EditorTile extends FlxSprite {
 	}
 
 	public function populateNeighbours() {
-		neighbours[CORNER_LEFT] = parent.getEditorTile(col - 1, row);
-		neighbours[CORNER_UP] = parent.getEditorTile(col, row - 2);
-		neighbours[CORNER_RIGHT] = parent.getEditorTile(col + 1, row);
-		neighbours[CORNER_DOWN] = parent.getEditorTile(col, row + 2);
-
-		if (row % 2 == 0) {
-			neighbours[SIDE_LEFT] = parent.getEditorTile(col - 1, row - 1);
-			neighbours[SIDE_UP] = parent.getEditorTile(col, row - 1);
-			neighbours[SIDE_RIGHT] = parent.getEditorTile(col, row + 1);
-			neighbours[SIDE_DOWN] = parent.getEditorTile(col - 1, row + 1);
-		} else {
-			neighbours[SIDE_LEFT] = parent.getEditorTile(col, row - 1);
-			neighbours[SIDE_UP] = parent.getEditorTile(col + 1, row - 1);
-			neighbours[SIDE_RIGHT] = parent.getEditorTile(col + 1, row + 1);
-			neighbours[SIDE_DOWN] = parent.getEditorTile(col, row + 1);
-		}
+		neighbours[CORNER_LEFT] = parent.getEditorTile(col - 1, row + 1);
+		neighbours[CORNER_UP] = parent.getEditorTile(col - 1, row - 1);
+		neighbours[CORNER_RIGHT] = parent.getEditorTile(col + 1, row - 1);
+		neighbours[CORNER_DOWN] = parent.getEditorTile(col + 1, row + 1);
+		neighbours[SIDE_LEFT] = parent.getEditorTile(col - 1, row);
+		neighbours[SIDE_UP] = parent.getEditorTile(col, row - 1);
+		neighbours[SIDE_RIGHT] = parent.getEditorTile(col + 1, row);
+		neighbours[SIDE_DOWN] = parent.getEditorTile(col, row + 1);
 	}
 
 	override public function update(elapsed:Float) {
 		var mouse_pos = FlxG.mouse.getWorldPosition();
-		hovering = FlxCollision.pixelPerfectPointCheck(Std.int(mouse_pos.x), Std.int(mouse_pos.y), this);
+		hovering = this.pixelsOverlapPoint(mouse_pos);
 
 		if (FlxG.mouse.justPressed && hovering) {
 			if (!selected) {
