@@ -4,79 +4,110 @@ import flixel.FlxG;
 import flixel.FlxState;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import haxe.ds.Vector;
+import hud.HUD;
+
+enum Tool {
+	REMOVE;
+	FLOOR;
+	WALL;
+}
 
 class PlayState extends FlxState {
 	public static inline var TILES_COLS = 15;
 	public static inline var TILES_ROWS = 15;
 
-	public var editor_tiles:FlxTypedGroup<EditorTile>;
-	public var editor_tiles_vec:Vector<Vector<EditorTile>>;
-	public var room_tiles:FlxTypedGroup<RoomTile>;
+	public var currentTool:Tool = REMOVE;
+	public var editorTiles:FlxTypedGroup<EditorTile>;
+	public var editorTilesVec:Vector<Vector<EditorTile>>;
+	public var floors:FlxTypedGroup<Floor>;
+	public var walls:FlxTypedGroup<Wall>;
 
-	public var ui:UI;
-	public var room_index:Int;
+	public var hud:HUD;
 
 	override public function create() {
 		super.create();
 
 		FlxG.camera.zoom = 2;
 
-		this.editor_tiles = new FlxTypedGroup<EditorTile>();
-		this.editor_tiles_vec = new Vector<Vector<EditorTile>>(TILES_COLS);
-		this.room_tiles = new FlxTypedGroup<RoomTile>();
+		this.editorTiles = new FlxTypedGroup<EditorTile>();
+		this.editorTilesVec = new Vector<Vector<EditorTile>>(TILES_COLS);
+		this.floors = new FlxTypedGroup<Floor>();
+		this.walls = new FlxTypedGroup<Wall>();
 
 		for (col in 0...TILES_COLS) {
-			this.editor_tiles_vec[col] = new Vector<EditorTile>(TILES_ROWS);
+			this.editorTilesVec[col] = new Vector<EditorTile>(TILES_ROWS);
 		}
 
 		var editor_tile:EditorTile;
 		for (row in 0...TILES_ROWS) {
 			for (col in 0...TILES_COLS) {
 				editor_tile = new EditorTile(col, row);
-				this.editor_tiles.add(editor_tile);
-				this.editor_tiles_vec[col][row] = editor_tile;
+				this.editorTiles.add(editor_tile);
+				this.editorTilesVec[col][row] = editor_tile;
 			}
 		}
 
 		for (row in 0...TILES_ROWS) {
 			for (col in 0...TILES_COLS) {
-				this.editor_tiles_vec[col][row].populateNeighbours();
+				this.editorTilesVec[col][row].populateNeighbours();
 			}
 		}
 
-		add(editor_tiles);
-		add(room_tiles);
+		add(editorTiles);
+		add(floors);
+		add(walls);
 
-		this.ui = new UI(this);
-		this.room_index = 0;
+		this.hud = new HUD(this);
+		this.hud.addButton("assets/images/hud/remove.png", (button) -> {
+			if (button.isSelected()) {
+				this.currentTool = REMOVE;
+			}
+		});
+		this.hud.addButton("assets/images/hud/floor.png", (button) -> {
+			if (button.isSelected()) {
+				this.currentTool = FLOOR;
+			}
+		});
+		this.hud.addButton("assets/images/hud/wall.png", (button) -> {
+			if (button.isSelected()) {
+				this.currentTool = WALL;
+			}
+		});
 
-		add(ui);
-	}
-
-	public function getEditorTile(col:Int, row:Int) {
-		if (editor_tiles_vec[col] != null)
-			return editor_tiles_vec[col][row];
-		return null;
+		add(hud);
 	}
 
 	override public function update(elapsed:Float) {
+		handleInput();
+
+		super.update(elapsed);
+	}
+
+	public function getEditorTile(col:Int, row:Int) {
+		if (editorTilesVec[col] != null)
+			return editorTilesVec[col][row];
+
+		return null;
+	}
+
+	public function handleInput() {
+		if (this.hud.handleInput()) {
+			return;
+		}
+
+		for (tile in this.editorTiles) {
+			if (tile.handleInput(currentTool)) {
+				return;
+			}
+		}
+
 		if (FlxG.mouse.pressedMiddle && !FlxG.mouse.justPressedMiddle) {
 			FlxG.camera.scroll.x -= FlxG.mouse.deltaScreenX;
 			FlxG.camera.scroll.y -= FlxG.mouse.deltaScreenY;
 		}
 
-		if (FlxG.mouse.wheel > 0) {
-			room_index += 1;
-		} else if (FlxG.mouse.wheel < 0) {
-			room_index -= 1;
+		if (FlxG.keys.pressed.CONTROL) {
+			FlxG.camera.zoom = Math.min(4, Math.max(1, FlxG.camera.zoom + FlxG.mouse.wheel));
 		}
-
-		if (room_index > 8) {
-			room_index = 0;
-		} else if (room_index < 0) {
-			room_index = 8;
-		}
-
-		super.update(elapsed);
 	}
 }

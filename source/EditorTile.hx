@@ -1,7 +1,9 @@
+import PlayState.Tool;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import haxe.display.Display.Package;
 
-enum Neighbour {
+enum NeighbourPosition {
 	CORNER_LEFT;
 	CORNER_UP;
 	CORNER_RIGHT;
@@ -18,98 +20,166 @@ class EditorTile extends FlxSprite {
 
 	public var col:Int;
 	public var row:Int;
-	public var selected:Bool;
 
 	var parent:PlayState = cast(FlxG.state, PlayState);
-	var neighbours:Map<Neighbour, EditorTile> = new Map();
-	var room_tile:RoomTile;
+	var neighbours:Map<NeighbourPosition, EditorTile> = new Map();
 	var hovering:Bool;
+
+	var floorActive:Bool;
+	var floor:Floor;
+
+	var wallActive:Bool;
+	var wall:Wall;
 
 	public function new(col:Int, row:Int) {
 		var x, y:Float;
 		this.col = col;
 		this.row = row;
 
-		x = col * EDITOR_WIDTH / 2 + (row * -EDITOR_WIDTH / 2);
+		x = col * EDITOR_WIDTH / 2 - (row * EDITOR_WIDTH / 2);
 		y = row * EDITOR_HEIGHT / 2 + (col * EDITOR_HEIGHT / 2);
 
 		super(x, y);
 
-		hovering = false;
-		selected = false;
+		this.hovering = false;
 
-		room_tile = new RoomTile(x - 3, y - 104, this);
-		room_tile.visible = false;
-		parent.room_tiles.add(room_tile);
+		this.floor = new Floor(x, y - 16, this);
+		this.floorActive = false;
+		this.floor.visible = false;
+		this.parent.floors.add(floor);
+
+		this.wall = new Wall(x - 3, y - 111, this);
+		this.wallActive = false;
+		this.wall.visible = false;
+		this.parent.walls.add(wall);
 
 		loadGraphic("assets/images/editor_tile.png", true, 45, 16);
-		animation.add("unselected", [0]);
-		animation.add("hover", [1]);
-		animation.play("unselected");
-	}
-
-	public function isNeighbourSelected(neighbour:Neighbour):Bool {
-		return neighbours[neighbour] != null && neighbours[neighbour].selected && neighbours[neighbour].getRoomIndex() == getRoomIndex();
-	}
-
-	public function getRoomIndex():Int {
-		return room_tile.room_index;
-	}
-
-	public function populateNeighbours() {
-		neighbours[CORNER_LEFT] = parent.getEditorTile(col - 1, row + 1);
-		neighbours[CORNER_UP] = parent.getEditorTile(col - 1, row - 1);
-		neighbours[CORNER_RIGHT] = parent.getEditorTile(col + 1, row - 1);
-		neighbours[CORNER_DOWN] = parent.getEditorTile(col + 1, row + 1);
-		neighbours[SIDE_LEFT] = parent.getEditorTile(col - 1, row);
-		neighbours[SIDE_UP] = parent.getEditorTile(col, row - 1);
-		neighbours[SIDE_RIGHT] = parent.getEditorTile(col + 1, row);
-		neighbours[SIDE_DOWN] = parent.getEditorTile(col, row + 1);
+		this.animation.add("unselected", [0]);
+		this.animation.add("hover", [1]);
+		this.animation.play("unselected");
 	}
 
 	override public function update(elapsed:Float) {
-		var mouse_pos = FlxG.mouse.getWorldPosition();
-		hovering = this.pixelsOverlapPoint(mouse_pos);
-
-		if (FlxG.mouse.justPressed && hovering) {
-			if (!selected) {
-				selected = true;
-				room_tile.visible = true;
-				this.visible = false;
-
-				room_tile.room_index = parent.room_index;
-				select();
-			} else {
-				selected = false;
-				room_tile.visible = false;
-				this.visible = true;
-			}
-
-			selectNeighbours();
-		}
+		var point = FlxG.mouse.getWorldPosition();
+		this.hovering = this.pixelsOverlapPoint(point);
 
 		animate();
 
 		super.update(elapsed);
 	}
 
-	public function select() {
-		room_tile.updateGraphics();
+	public function clear() {
+		setWall(false);
+		setFloor(false);
 	}
 
-	function selectNeighbours() {
-		for (neighbour in neighbours.keys())
-			if (isNeighbourSelected(neighbour))
-				neighbours[neighbour].select();
+	public function getNeighbour(neighbour:NeighbourPosition):EditorTile {
+		return this.neighbours[neighbour];
+	}
+
+	public function handleInput(tool:Tool):Bool {
+		if (hovering) {
+			if (FlxG.mouse.pressed) {
+				switch (tool) {
+					case REMOVE:
+						clear();
+					case FLOOR:
+						setFloor(true);
+					case WALL:
+						setWall(true);
+				}
+
+				return true;
+			} else if (FlxG.mouse.pressedRight) {
+				switch (tool) {
+					case REMOVE:
+						clear();
+					case FLOOR:
+						setFloor(false);
+					case WALL:
+						setWall(false);
+				}
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public function hasFloor():Bool {
+		return this.floorActive;
+	}
+
+	public function hasWall():Bool {
+		return this.wallActive;
+	}
+
+	public function setFloor(selected:Bool) {
+		if (this.floorActive != selected) {
+			if (!selected) {
+				setWall(false);
+			}
+
+			this.floorActive = selected;
+			this.floor.visible = selected;
+
+			this.floor.updateGraphics();
+			updateNeighborsGraphics();
+		}
+	}
+
+	public function setWall(selected:Bool) {
+		if (this.floorActive) {
+			if (this.wallActive != selected) {
+				this.wallActive = selected;
+				this.wall.visible = selected;
+				this.wall.updateGraphics();
+				updateNeighborsGraphics();
+			}
+		}
+	}
+
+	public function isNeighbourActive(neighbour:NeighbourPosition):Bool {
+		return this.neighbours[neighbour] != null && this.neighbours[neighbour].isActive();
+	}
+
+	public function isActive():Bool {
+		return this.floorActive || this.wallActive;
+	}
+
+	public function populateNeighbours() {
+		this.neighbours[CORNER_LEFT] = parent.getEditorTile(col - 1, row + 1);
+		this.neighbours[CORNER_UP] = parent.getEditorTile(col - 1, row - 1);
+		this.neighbours[CORNER_RIGHT] = parent.getEditorTile(col + 1, row - 1);
+		this.neighbours[CORNER_DOWN] = parent.getEditorTile(col + 1, row + 1);
+		this.neighbours[SIDE_LEFT] = parent.getEditorTile(col - 1, row);
+		this.neighbours[SIDE_UP] = parent.getEditorTile(col, row - 1);
+		this.neighbours[SIDE_RIGHT] = parent.getEditorTile(col + 1, row);
+		this.neighbours[SIDE_DOWN] = parent.getEditorTile(col, row + 1);
+	}
+
+	public function updateGraphics() {
+		if (this.floorActive) {
+			this.floor.updateGraphics();
+		}
+
+		if (this.wallActive) {
+			this.wall.updateGraphics();
+		}
+	}
+
+	function updateNeighborsGraphics() {
+		for (neighbour in this.neighbours.keys())
+			if (isNeighbourActive(neighbour))
+				this.neighbours[neighbour].updateGraphics();
 	}
 
 	function animate() {
-		if (!selected) {
-			if (hovering) {
-				animation.play("hover");
-			} else {
-				animation.play("unselected");
-			}
+		if (this.hovering) {
+			animation.play("hover");
+		} else {
+			animation.play("unselected");
 		}
 	}
 }
