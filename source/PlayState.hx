@@ -91,6 +91,8 @@ class PlayState extends FlxState {
 	}
 
 	public function handleInput() {
+		var mouseWorldPos = FlxG.mouse.getWorldPosition();
+
 		if (this.hud.handleInput()) {
 			return;
 		}
@@ -107,7 +109,15 @@ class PlayState extends FlxState {
 		}
 
 		if (FlxG.keys.pressed.CONTROL) {
-			FlxG.camera.zoom = Math.min(4, Math.max(1, FlxG.camera.zoom + FlxG.mouse.wheel));
+			var oldZoom = FlxG.camera.zoom;
+			var newZoom = Math.min(4, Math.max(1, oldZoom + FlxG.mouse.wheel));
+
+			if (oldZoom != newZoom) {
+				FlxG.camera.zoom = newZoom;
+				var newMouseWorldPos = FlxG.mouse.getWorldPosition();
+				var diffPos = newMouseWorldPos.subtractPoint(mouseWorldPos);
+				FlxG.camera.scroll.subtractPoint(diffPos);
+			}
 		}
 	}
 }

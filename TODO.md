@@ -9,6 +9,7 @@
 ## In Progress
 
 ## Done
+- [X] Editor: Zoom into point
 - [X] Editor: Fix tile coordinate placement
 - [X] Editor: Separate walls and floors
 - [X] Editor: Allow for placement/removal while moving mouse
