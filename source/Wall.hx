@@ -6,18 +6,24 @@ import openfl.display.BitmapData;
 import openfl.geom.Point;
 
 enum Fragment {
-	WALL_CORNER_LEFT;
-	WALL_CORNER_UP;
-	WALL_CORNER_RIGHT;
-	WALL_CORNER_DOWN;
-	WALL_SIDE_LEFT;
-	WALL_SIDE_LEFT_CUT;
-	WALL_SIDE_LEFT_UP;
-	WALL_SIDE_UP;
-	WALL_SIDE_UP_CUT;
-	WALL_SIDE_RIGHT;
-	WALL_SIDE_RIGHT_DOWN;
-	WALL_SIDE_DOWN;
+	WALL_NO;
+	WALL_SINGLE_1;
+	WALL_SINGLE_2;
+	WALL_SINGLE_3;
+	WALL_SINGLE_4;
+	WALL_DOUBLE_1;
+	WALL_DOUBLE_2;
+	WALL_DOUBLE_3;
+	WALL_DOUBLE_4;
+	WALL_DOUBLE_5;
+	WALL_DOUBLE_6;
+	WALL_TRIPLE_1;
+	WALL_TRIPLE_2;
+	WALL_TRIPLE_3;
+	WALL_TRIPLE_4;
+	WALL_QUAD;
+	WALL_SIDE_1;
+	WALL_SIDE_2;
 }
 
 class Wall extends FlxSprite {
@@ -36,34 +42,61 @@ class Wall extends FlxSprite {
 	}
 
 	public function updateGraphics() {
-		makeGraphic(51, 127, FlxColor.TRANSPARENT, true);
+		makeGraphic(48, 128, FlxColor.TRANSPARENT, true);
+		var up = neighbourHasWall(SIDE_UP);
+		var right = neighbourHasWall(SIDE_RIGHT);
+		var down = neighbourHasWall(SIDE_DOWN);
+		var left = neighbourHasWall(SIDE_LEFT);
 
-		if (!neighbourHasWall(SIDE_LEFT) && !neighbourHasWall(SIDE_UP))
-			stampFragment(WALL_SIDE_LEFT_UP);
-		else if (!neighbourHasWall(SIDE_LEFT) && !neighbourHasWall(CORNER_UP))
-			stampFragment(WALL_SIDE_LEFT);
-		else if (!neighbourHasWall(SIDE_LEFT))
-			stampFragment(WALL_SIDE_LEFT_CUT);
-		else if (!neighbourHasWall(SIDE_UP) && !neighbourHasWall(CORNER_UP))
-			stampFragment(WALL_SIDE_UP);
-		else if (!neighbourHasWall(SIDE_UP))
-			stampFragment(WALL_SIDE_UP_CUT);
+		if (up && right && down && left) {
+			stampFragment(WALL_QUAD);
+		} else if (up && right && down) {
+			stampFragment(WALL_TRIPLE_1);
+		} else if (up && right && left) {
+			stampFragment(WALL_TRIPLE_2);
+		} else if (up && down && left) {
+			stampFragment(WALL_TRIPLE_3);
+		} else if (right && down && left) {
+			stampFragment(WALL_TRIPLE_4);
+		} else if (up && right) {
+			stampFragment(WALL_DOUBLE_1);
+		} else if (up && down) {
+			stampFragment(WALL_DOUBLE_2);
+		} else if (up && left) {
+			stampFragment(WALL_DOUBLE_3);
+		} else if (right && down) {
+			stampFragment(WALL_DOUBLE_4);
+		} else if (right && left) {
+			stampFragment(WALL_DOUBLE_5);
+		} else if (down && left) {
+			stampFragment(WALL_DOUBLE_6);
+		} else if (up) {
+			stampFragment(WALL_SINGLE_1);
+		} else if (right) {
+			stampFragment(WALL_SINGLE_2);
+		} else if (down) {
+			stampFragment(WALL_SINGLE_3);
+		} else if (left) {
+			stampFragment(WALL_SINGLE_4);
+		} else {
+			stampFragment(WALL_NO);
+		}
 
-		if (!neighbourHasWall(SIDE_RIGHT) && !neighbourHasWall(SIDE_DOWN))
-			stampFragment(WALL_SIDE_RIGHT_DOWN);
-		else if (!neighbourHasWall(SIDE_RIGHT))
-			stampFragment(WALL_SIDE_RIGHT);
-		else if (!neighbourHasWall(SIDE_DOWN))
-			stampFragment(WALL_SIDE_DOWN);
+		if (neighbourHasFloor(SIDE_RIGHT) && !neighbourHasFloor(SIDE_DOWN) && !neighbourHasFloor(SIDE_LEFT)) {
+			stampFragment(WALL_SIDE_1);
+		} else if (!neighbourHasFloor(SIDE_UP) && !neighbourHasFloor(SIDE_RIGHT) && neighbourHasFloor(SIDE_DOWN)) {
+			stampFragment(WALL_SIDE_2);
+		}
+	}
 
-		if (!neighbourHasWall(SIDE_DOWN) && !neighbourHasWall(SIDE_LEFT))
-			stampFragment(WALL_CORNER_LEFT);
-		if (neighbourHasWall(SIDE_LEFT) && !neighbourHasWall(CORNER_UP) && neighbourHasWall(SIDE_UP))
-			stampFragment(WALL_CORNER_UP);
-		if (!neighbourHasWall(SIDE_UP) && !neighbourHasWall(SIDE_RIGHT))
-			stampFragment(WALL_CORNER_RIGHT);
-		if (neighbourHasWall(SIDE_RIGHT) && !neighbourHasWall(CORNER_DOWN) && neighbourHasWall(SIDE_DOWN))
-			stampFragment(WALL_CORNER_DOWN);
+	function neighbourHasFloor(neighbour:NeighbourPosition):Bool {
+		var neighbour = parent.getNeighbour(neighbour);
+
+		if (neighbour != null) {
+			return neighbour.hasFloor();
+		}
+
+		return false;
 	}
 
 	function neighbourHasWall(neighbour:NeighbourPosition):Bool {

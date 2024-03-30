@@ -48,7 +48,7 @@ class EditorTile extends FlxSprite {
 		this.floor.visible = false;
 		this.parent.floors.add(floor);
 
-		this.wall = new Wall(x - 3, y - 111, this);
+		this.wall = new Wall(x, y - 112, this);
 		this.wallActive = false;
 		this.wall.visible = false;
 		this.parent.walls.add(wall);

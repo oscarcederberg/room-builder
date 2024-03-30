@@ -1,12 +1,12 @@
 # room-builder
 
 ## Backlog
-- [ ] Walls: Fix wall graphics
-- [ ] Walls: Add points for walls
 - [ ] HUD: Refactor radio button group
 - [ ] HUD: Add keybinds
 
 ## In Progress
+- [ ] Walls: Fix wall graphics
+- [ ] Walls: Add points for walls
 
 ## Done
 - [X] Editor: Zoom into point
