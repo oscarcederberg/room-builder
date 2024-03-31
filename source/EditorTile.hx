@@ -1,43 +1,47 @@
 import PlayState.Tool;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import haxe.display.Display.Package;
 
-enum NeighbourPosition {
-	CORNER_LEFT;
-	CORNER_UP;
-	CORNER_RIGHT;
-	CORNER_DOWN;
-	SIDE_LEFT;
-	SIDE_UP;
-	SIDE_RIGHT;
-	SIDE_DOWN;
+enum TileNeighbors {
+	TILE_CORNER_UP;
+	TILE_CORNER_RIGHT;
+	TILE_CORNER_DOWN;
+	TILE_CORNER_LEFT;
+	TILE_SIDE_UP;
+	TILE_SIDE_RIGHT;
+	TILE_SIDE_DOWN;
+	TILE_SIDE_LEFT;
+}
+
+enum PointPositions {
+	POINT_CORNER_UP;
+	POINT_CORNER_RIGHT;
+	POINT_CORNER_DOWN;
+	POINT_CORNER_LEFT;
 }
 
 class EditorTile extends FlxSprite {
-	public static final EDITOR_WIDTH = 48;
-	public static final EDITOR_HEIGHT = 16;
+	public static final EDITOR_TILE_WIDTH = 48;
+	public static final EDITOR_TILE_HEIGHT = 16;
 
 	public var col:Int;
 	public var row:Int;
 
 	var parent:PlayState = cast(FlxG.state, PlayState);
-	var neighbours:Map<NeighbourPosition, EditorTile> = new Map();
+	var neighbors:Map<TileNeighbors, EditorTile> = new Map();
+	var points:Map<PointPositions, EditorPoint> = new Map();
 	var hovering:Bool;
 
 	var floorActive:Bool;
 	var floor:Floor;
-
-	var wallActive:Bool;
-	var wall:Wall;
 
 	public function new(col:Int, row:Int) {
 		var x, y:Float;
 		this.col = col;
 		this.row = row;
 
-		x = col * EDITOR_WIDTH / 2 - (row * EDITOR_WIDTH / 2);
-		y = row * EDITOR_HEIGHT / 2 + (col * EDITOR_HEIGHT / 2);
+		x = col * EDITOR_TILE_WIDTH / 2 - (row * EDITOR_TILE_WIDTH / 2);
+		y = row * EDITOR_TILE_HEIGHT / 2 + (col * EDITOR_TILE_HEIGHT / 2);
 
 		super(x, y);
 
@@ -47,11 +51,6 @@ class EditorTile extends FlxSprite {
 		this.floorActive = false;
 		this.floor.visible = false;
 		this.parent.floors.add(floor);
-
-		this.wall = new Wall(x, y - 112, this);
-		this.wallActive = false;
-		this.wall.visible = false;
-		this.parent.walls.add(wall);
 
 		loadGraphic("assets/images/editor_tile.png", true, 45, 16);
 		this.animation.add("unselected", [0]);
@@ -73,8 +72,8 @@ class EditorTile extends FlxSprite {
 		setFloor(false);
 	}
 
-	public function getNeighbour(neighbour:NeighbourPosition):EditorTile {
-		return this.neighbours[neighbour];
+	public function getNeighbour(neighbor:TileNeighbors):EditorTile {
+		return this.neighbors[neighbor];
 	}
 
 	public function handleInput(tool:Tool):Bool {
@@ -140,8 +139,8 @@ class EditorTile extends FlxSprite {
 		}
 	}
 
-	public function isNeighbourActive(neighbour:NeighbourPosition):Bool {
-		return this.neighbours[neighbour] != null && this.neighbours[neighbour].isActive();
+	public function isNeighbourActive(neighbor:TileNeighbors):Bool {
+		return this.neighbors[neighbor] != null && this.neighbors[neighbor].isActive();
 	}
 
 	public function isActive():Bool {
@@ -149,14 +148,14 @@ class EditorTile extends FlxSprite {
 	}
 
 	public function populateNeighbours() {
-		this.neighbours[CORNER_LEFT] = parent.getEditorTile(col - 1, row + 1);
-		this.neighbours[CORNER_UP] = parent.getEditorTile(col - 1, row - 1);
-		this.neighbours[CORNER_RIGHT] = parent.getEditorTile(col + 1, row - 1);
-		this.neighbours[CORNER_DOWN] = parent.getEditorTile(col + 1, row + 1);
-		this.neighbours[SIDE_LEFT] = parent.getEditorTile(col - 1, row);
-		this.neighbours[SIDE_UP] = parent.getEditorTile(col, row - 1);
-		this.neighbours[SIDE_RIGHT] = parent.getEditorTile(col + 1, row);
-		this.neighbours[SIDE_DOWN] = parent.getEditorTile(col, row + 1);
+		this.neighbors[TILE_CORNER_UP] = parent.getEditorTile(col - 1, row - 1);
+		this.neighbors[TILE_CORNER_RIGHT] = parent.getEditorTile(col + 1, row - 1);
+		this.neighbors[TILE_CORNER_DOWN] = parent.getEditorTile(col + 1, row + 1);
+		this.neighbors[TILE_CORNER_LEFT] = parent.getEditorTile(col - 1, row + 1);
+		this.neighbors[TILE_SIDE_UP] = parent.getEditorTile(col, row - 1);
+		this.neighbors[TILE_SIDE_RIGHT] = parent.getEditorTile(col + 1, row);
+		this.neighbors[TILE_SIDE_DOWN] = parent.getEditorTile(col, row + 1);
+		this.neighbors[TILE_SIDE_LEFT] = parent.getEditorTile(col - 1, row);
 	}
 
 	public function updateGraphics() {
@@ -170,9 +169,9 @@ class EditorTile extends FlxSprite {
 	}
 
 	function updateNeighborsGraphics() {
-		for (neighbour in this.neighbours.keys())
-			if (isNeighbourActive(neighbour))
-				this.neighbours[neighbour].updateGraphics();
+		for (neighbor in this.neighbors.keys())
+			if (isNeighbourActive(neighbor))
+				this.neighbors[neighbor].updateGraphics();
 	}
 
 	function animate() {

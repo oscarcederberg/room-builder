@@ -1,6 +1,7 @@
 # room-builder
 
 ## Backlog
+- [ ] Code: Refactor tile group
 - [ ] HUD: Refactor radio button group
 - [ ] HUD: Add keybinds
 

@@ -1,4 +1,5 @@
-import EditorTile.NeighbourPosition;
+import EditorPoint.PointNeighbors;
+import EditorTile.TileNeighbors;
 import flixel.FlxSprite;
 import flixel.system.FlxAssets;
 import flixel.util.FlxColor;
@@ -29,12 +30,12 @@ enum Fragment {
 class Wall extends FlxSprite {
 	public static var bitmaps:haxe.ds.Map<Fragment, BitmapData> = new Map();
 
-	var parent:EditorTile;
+	var point:EditorPoint;
 
-	public function new(x:Float, y:Float, parent:EditorTile) {
+	public function new(x:Float, y:Float, point:EditorPoint) {
 		super(x, y);
 
-		this.parent = parent;
+		this.point = point;
 	}
 
 	public function stampFragment(fragment:Fragment) {
@@ -43,10 +44,10 @@ class Wall extends FlxSprite {
 
 	public function updateGraphics() {
 		makeGraphic(48, 128, FlxColor.TRANSPARENT, true);
-		var up = neighbourHasWall(SIDE_UP);
-		var right = neighbourHasWall(SIDE_RIGHT);
-		var down = neighbourHasWall(SIDE_DOWN);
-		var left = neighbourHasWall(SIDE_LEFT);
+		var up = neighborHasWall(SIDE_UP);
+		var right = neighborHasWall(SIDE_RIGHT);
+		var down = neighborHasWall(SIDE_DOWN);
+		var left = neighborHasWall(SIDE_LEFT);
 
 		if (up && right && down && left) {
 			stampFragment(WALL_QUAD);
@@ -81,29 +82,13 @@ class Wall extends FlxSprite {
 		} else {
 			stampFragment(WALL_NO);
 		}
-
-		if (neighbourHasFloor(SIDE_RIGHT) && !neighbourHasFloor(SIDE_DOWN) && !neighbourHasFloor(SIDE_LEFT)) {
-			stampFragment(WALL_SIDE_1);
-		} else if (!neighbourHasFloor(SIDE_UP) && !neighbourHasFloor(SIDE_RIGHT) && neighbourHasFloor(SIDE_DOWN)) {
-			stampFragment(WALL_SIDE_2);
-		}
 	}
 
-	function neighbourHasFloor(neighbour:NeighbourPosition):Bool {
-		var neighbour = parent.getNeighbour(neighbour);
+	function neighborHasWall(neighbor:PointNeighbors):Bool {
+		var neighbor = parent.getNeighbour(neighbor);
 
-		if (neighbour != null) {
-			return neighbour.hasFloor();
-		}
-
-		return false;
-	}
-
-	function neighbourHasWall(neighbour:NeighbourPosition):Bool {
-		var neighbour = parent.getNeighbour(neighbour);
-
-		if (neighbour != null) {
-			return neighbour.hasWall();
+		if (neighbor != null) {
+			return neighbor.hasWall();
 		}
 
 		return false;

@@ -13,8 +13,8 @@ enum Tool {
 }
 
 class PlayState extends FlxState {
-	public static inline var TILES_COLS = 15;
-	public static inline var TILES_ROWS = 15;
+	public static inline var TILES_COLS = 16;
+	public static inline var TILES_ROWS = 16;
 
 	public var currentTool:Tool = REMOVE;
 	public var editorTiles:FlxTypedGroup<EditorTile>;

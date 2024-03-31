@@ -1,4 +1,4 @@
-import EditorTile.NeighbourPosition;
+import EditorTile.TileNeighbors;
 import flixel.FlxSprite;
 import flixel.system.FlxAssets;
 import flixel.util.FlxColor;
@@ -54,26 +54,26 @@ class Floor extends FlxSprite {
 		updateCornerGraphics(SIDE_LEFT, CORNER_LEFT, SIDE_DOWN, FLOOR_LEFT_1, FLOOR_LEFT_2, FLOOR_LEFT_3, FLOOR_LEFT_4, FLOOR_LEFT_5);
 	}
 
-	function updateCornerGraphics(side_a:NeighbourPosition, corner:NeighbourPosition, side_b:NeighbourPosition, fragment_1:FloorFragment,
-			fragment_2:FloorFragment, fragment_3:FloorFragment, fragment_4:FloorFragment, fragment_5:FloorFragment) {
-		if (neighbourHasFloor(side_a) && neighbourHasFloor(corner) && neighbourHasFloor(side_b)) {
+	function updateCornerGraphics(side_a:TileNeighbors, corner:TileNeighbors, side_b:TileNeighbors, fragment_1:FloorFragment, fragment_2:FloorFragment,
+			fragment_3:FloorFragment, fragment_4:FloorFragment, fragment_5:FloorFragment) {
+		if (neighborHasFloor(side_a) && neighborHasFloor(corner) && neighborHasFloor(side_b)) {
 			stampFragment(fragment_5);
-		} else if (neighbourHasFloor(side_a) && neighbourHasFloor(side_b)) {
+		} else if (neighborHasFloor(side_a) && neighborHasFloor(side_b)) {
 			stampFragment(fragment_4);
-		} else if (neighbourHasFloor(side_a)) {
+		} else if (neighborHasFloor(side_a)) {
 			stampFragment(fragment_3);
-		} else if (neighbourHasFloor(side_b)) {
+		} else if (neighborHasFloor(side_b)) {
 			stampFragment(fragment_2);
 		} else {
 			stampFragment(fragment_1);
 		}
 	}
 
-	function neighbourHasFloor(neighbour:NeighbourPosition):Bool {
-		var neighbour = parent.getNeighbour(neighbour);
+	function neighborHasFloor(neighbor:TileNeighbors):Bool {
+		var neighbor = parent.getNeighbour(neighbor);
 
-		if (neighbour != null) {
-			return neighbour.hasFloor();
+		if (neighbor != null) {
+			return neighbor.hasFloor();
 		}
 
 		return false;
