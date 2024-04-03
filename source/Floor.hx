@@ -1,4 +1,6 @@
+import EditorTile.PointPositions;
 import EditorTile.TileNeighbors;
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.system.FlxAssets;
 import flixel.util.FlxColor;
@@ -6,89 +8,112 @@ import openfl.display.BitmapData;
 import openfl.geom.Point;
 
 enum FloorFragment {
-	FLOOR_MID;
-	FLOOR_UP_1;
-	FLOOR_UP_2;
-	FLOOR_UP_3;
-	FLOOR_UP_4;
-	FLOOR_UP_5;
-	FLOOR_RIGHT_1;
-	FLOOR_RIGHT_2;
-	FLOOR_RIGHT_3;
-	FLOOR_RIGHT_4;
-	FLOOR_RIGHT_5;
-	FLOOR_DOWN_1;
-	FLOOR_DOWN_2;
-	FLOOR_DOWN_3;
-	FLOOR_DOWN_4;
-	FLOOR_DOWN_5;
-	FLOOR_LEFT_1;
-	FLOOR_LEFT_2;
-	FLOOR_LEFT_3;
-	FLOOR_LEFT_4;
-	FLOOR_LEFT_5;
+    FLOOR_MID;
+    FLOOR_UP_1;
+    FLOOR_UP_2;
+    FLOOR_UP_3;
+    FLOOR_UP_4;
+    FLOOR_UP_5;
+    FLOOR_RIGHT_1;
+    FLOOR_RIGHT_2;
+    FLOOR_RIGHT_3;
+    FLOOR_RIGHT_4;
+    FLOOR_RIGHT_5;
+    FLOOR_DOWN_1;
+    FLOOR_DOWN_2;
+    FLOOR_DOWN_3;
+    FLOOR_DOWN_4;
+    FLOOR_DOWN_5;
+    FLOOR_LEFT_1;
+    FLOOR_LEFT_2;
+    FLOOR_LEFT_3;
+    FLOOR_LEFT_4;
+    FLOOR_LEFT_5;
 }
 
 class Floor extends FlxSprite {
-	public static var bitmaps:haxe.ds.Map<FloorFragment, BitmapData> = new Map();
+    public static final FLOOR_WIDTH = 48;
+    public static final FLOOR_GRAPHICS_WIDTH = 45;
+    public static final FLOOR_HEIGHT = 32;
 
-	var parent:EditorTile;
+    public static var bitmaps:Map<FloorFragment, BitmapData> = new Map();
 
-	public function new(x:Float, y:Float, parent:EditorTile) {
-		super(x, y);
+    var parent:PlayState = cast(FlxG.state, PlayState);
+    var tile:EditorTile;
 
-		this.parent = parent;
-	}
+    public function new(x:Float, y:Float, tile:EditorTile) {
+        super(x, y);
 
-	public function stampFragment(fragment:FloorFragment) {
-		this.graphic.bitmap.copyPixels(bitmaps[fragment], bitmaps[fragment].rect, new Point(0, 0), null, null, true);
-	}
+        this.tile = tile;
+    }
 
-	public function updateGraphics() {
-		makeGraphic(48, 32, FlxColor.TRANSPARENT, true);
+    override function kill() {
+        super.kill();
+    }
 
-		stampFragment(FLOOR_MID);
-		updateCornerGraphics(SIDE_UP, CORNER_UP, SIDE_LEFT, FLOOR_UP_1, FLOOR_UP_2, FLOOR_UP_3, FLOOR_UP_4, FLOOR_UP_5);
-		updateCornerGraphics(SIDE_RIGHT, CORNER_RIGHT, SIDE_UP, FLOOR_RIGHT_1, FLOOR_RIGHT_2, FLOOR_RIGHT_3, FLOOR_RIGHT_4, FLOOR_RIGHT_5);
-		updateCornerGraphics(SIDE_DOWN, CORNER_DOWN, SIDE_RIGHT, FLOOR_DOWN_1, FLOOR_DOWN_2, FLOOR_DOWN_3, FLOOR_DOWN_4, FLOOR_DOWN_5);
-		updateCornerGraphics(SIDE_LEFT, CORNER_LEFT, SIDE_DOWN, FLOOR_LEFT_1, FLOOR_LEFT_2, FLOOR_LEFT_3, FLOOR_LEFT_4, FLOOR_LEFT_5);
-	}
+    public function getNeighbor(neighbor:TileNeighbors):Floor {
+        var neighbor = tile.getNeighbor(neighbor);
 
-	function updateCornerGraphics(side_a:TileNeighbors, corner:TileNeighbors, side_b:TileNeighbors, fragment_1:FloorFragment, fragment_2:FloorFragment,
-			fragment_3:FloorFragment, fragment_4:FloorFragment, fragment_5:FloorFragment) {
-		if (neighborHasFloor(side_a) && neighborHasFloor(corner) && neighborHasFloor(side_b)) {
-			stampFragment(fragment_5);
-		} else if (neighborHasFloor(side_a) && neighborHasFloor(side_b)) {
-			stampFragment(fragment_4);
-		} else if (neighborHasFloor(side_a)) {
-			stampFragment(fragment_3);
-		} else if (neighborHasFloor(side_b)) {
-			stampFragment(fragment_2);
-		} else {
-			stampFragment(fragment_1);
-		}
-	}
+        if (neighbor != null) {
+            return neighbor.getFloor();
+        }
 
-	function neighborHasFloor(neighbor:TileNeighbors):Bool {
-		var neighbor = parent.getNeighbour(neighbor);
+        return null;
+    }
 
-		if (neighbor != null) {
-			return neighbor.hasFloor();
-		}
+    public function neighborHasFloor(neighbor:TileNeighbors):Bool {
+        var neighbor = tile.getNeighbor(neighbor);
 
-		return false;
-	}
+        if (neighbor != null) {
+            return neighbor.hasFloor();
+        }
 
-	public static function loadFragmentAsset(fragment:FloorFragment, asset:String) {
-		bitmaps[fragment] = FlxAssets.getBitmapData(asset);
-	}
+        return false;
+    }
 
-	public static function loadAllFragmentAssets() {
-		for (frag in FloorFragment.createAll()) {
-			var name = frag.getName().toLowerCase();
-			var split = name.indexOf("_");
-			var asset = 'assets/images/${name.substring(0, split)}/${name.substring(split + 1)}.png';
-			loadFragmentAsset(frag, asset);
-		}
-	}
+    public function stampFragment(fragment:FloorFragment) {
+        this.graphic.bitmap.copyPixels(bitmaps[fragment], bitmaps[fragment].rect, new Point(0, 0), null, null, true);
+    }
+
+    public function updateGraphics() {
+        makeGraphic(FLOOR_WIDTH, FLOOR_HEIGHT, FlxColor.TRANSPARENT, true);
+
+        stampFragment(FLOOR_MID);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_UP, TILE_NEIGHBOR_CORNER_UP, TILE_NEIGHBOR_SIDE_LEFT, FLOOR_UP_1, FLOOR_UP_2, FLOOR_UP_3, FLOOR_UP_4,
+            FLOOR_UP_5);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_RIGHT, TILE_NEIGHBOR_CORNER_RIGHT, TILE_NEIGHBOR_SIDE_UP, FLOOR_RIGHT_1, FLOOR_RIGHT_2, FLOOR_RIGHT_3,
+            FLOOR_RIGHT_4, FLOOR_RIGHT_5);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_DOWN, TILE_NEIGHBOR_CORNER_DOWN, TILE_NEIGHBOR_SIDE_RIGHT, FLOOR_DOWN_1, FLOOR_DOWN_2, FLOOR_DOWN_3,
+            FLOOR_DOWN_4, FLOOR_DOWN_5);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_LEFT, TILE_NEIGHBOR_CORNER_LEFT, TILE_NEIGHBOR_SIDE_DOWN, FLOOR_LEFT_1, FLOOR_LEFT_2, FLOOR_LEFT_3,
+            FLOOR_LEFT_4, FLOOR_LEFT_5);
+    }
+
+    function updateCornerGraphics(side_a:TileNeighbors, corner:TileNeighbors, side_b:TileNeighbors, fragment_1:FloorFragment, fragment_2:FloorFragment,
+            fragment_3:FloorFragment, fragment_4:FloorFragment, fragment_5:FloorFragment) {
+        if (neighborHasFloor(side_a) && neighborHasFloor(corner) && neighborHasFloor(side_b)) {
+            stampFragment(fragment_5);
+        } else if (neighborHasFloor(side_a) && neighborHasFloor(side_b)) {
+            stampFragment(fragment_4);
+        } else if (neighborHasFloor(side_a)) {
+            stampFragment(fragment_3);
+        } else if (neighborHasFloor(side_b)) {
+            stampFragment(fragment_2);
+        } else {
+            stampFragment(fragment_1);
+        }
+    }
+
+    public static function loadFragmentAsset(fragment:FloorFragment, asset:String) {
+        bitmaps[fragment] = FlxAssets.getBitmapData(asset);
+    }
+
+    public static function loadAllFragmentAssets() {
+        for (frag in FloorFragment.createAll()) {
+            var name = frag.getName().toLowerCase();
+            var split = name.indexOf("_");
+            var asset = 'assets/images/${name.substring(0, split)}/${name.substring(split + 1)}.png';
+            loadFragmentAsset(frag, asset);
+        }
+    }
 }

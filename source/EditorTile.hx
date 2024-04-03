@@ -1,184 +1,243 @@
 import PlayState.Tool;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.util.FlxSort;
 
 enum TileNeighbors {
-	TILE_CORNER_UP;
-	TILE_CORNER_RIGHT;
-	TILE_CORNER_DOWN;
-	TILE_CORNER_LEFT;
-	TILE_SIDE_UP;
-	TILE_SIDE_RIGHT;
-	TILE_SIDE_DOWN;
-	TILE_SIDE_LEFT;
+    TILE_NEIGHBOR_CORNER_UP;
+    TILE_NEIGHBOR_CORNER_RIGHT;
+    TILE_NEIGHBOR_CORNER_DOWN;
+    TILE_NEIGHBOR_CORNER_LEFT;
+    TILE_NEIGHBOR_SIDE_UP;
+    TILE_NEIGHBOR_SIDE_RIGHT;
+    TILE_NEIGHBOR_SIDE_DOWN;
+    TILE_NEIGHBOR_SIDE_LEFT;
 }
 
 enum PointPositions {
-	POINT_CORNER_UP;
-	POINT_CORNER_RIGHT;
-	POINT_CORNER_DOWN;
-	POINT_CORNER_LEFT;
+    POINT_CORNER_UP;
+    POINT_CORNER_RIGHT;
+    POINT_CORNER_DOWN;
+    POINT_CORNER_LEFT;
 }
 
 class EditorTile extends FlxSprite {
-	public static final EDITOR_TILE_WIDTH = 48;
-	public static final EDITOR_TILE_HEIGHT = 16;
+    public static final EDITOR_TILE_WIDTH = 48;
+    public static final EDITOR_TILE_GRAPHICS_WIDTH = 45;
+    public static final EDITOR_TILE_HEIGHT = 16;
 
-	public var col:Int;
-	public var row:Int;
+    public var col:Int;
+    public var row:Int;
 
-	var parent:PlayState = cast(FlxG.state, PlayState);
-	var neighbors:Map<TileNeighbors, EditorTile> = new Map();
-	var points:Map<PointPositions, EditorPoint> = new Map();
-	var hovering:Bool;
+    var parent:PlayState = cast(FlxG.state, PlayState);
+    var points:Map<PointPositions, EditorPoint> = new Map();
+    var neighborTiles:Map<TileNeighbors, EditorTile> = new Map();
+    var hovering:Bool;
 
-	var floorActive:Bool;
-	var floor:Floor;
+    var floor:Floor = null;
 
-	public function new(col:Int, row:Int) {
-		var x, y:Float;
-		this.col = col;
-		this.row = row;
+    public function new(col:Int, row:Int) {
+        var x, y:Float;
 
-		x = col * EDITOR_TILE_WIDTH / 2 - (row * EDITOR_TILE_WIDTH / 2);
-		y = row * EDITOR_TILE_HEIGHT / 2 + (col * EDITOR_TILE_HEIGHT / 2);
+        this.col = col;
+        this.row = row;
+        x = col * EDITOR_TILE_WIDTH / 2 - (row * EDITOR_TILE_WIDTH / 2);
+        y = row * EDITOR_TILE_HEIGHT / 2 + (col * EDITOR_TILE_HEIGHT / 2);
+        super(x, y);
 
-		super(x, y);
+        this.hovering = false;
 
-		this.hovering = false;
+        loadGraphic("assets/images/editor_tile.png", true, EDITOR_TILE_GRAPHICS_WIDTH, EDITOR_TILE_HEIGHT);
+        this.animation.add("unselected", [0]);
+        this.animation.add("hover", [1]);
+        this.animation.play("unselected");
+    }
 
-		this.floor = new Floor(x, y - 16, this);
-		this.floorActive = false;
-		this.floor.visible = false;
-		this.parent.floors.add(floor);
+    override public function update(elapsed:Float) {
+        var point = FlxG.mouse.getWorldPosition();
+        this.hovering = this.pixelsOverlapPoint(point);
 
-		loadGraphic("assets/images/editor_tile.png", true, 45, 16);
-		this.animation.add("unselected", [0]);
-		this.animation.add("hover", [1]);
-		this.animation.play("unselected");
-	}
+        animate();
 
-	override public function update(elapsed:Float) {
-		var point = FlxG.mouse.getWorldPosition();
-		this.hovering = this.pixelsOverlapPoint(point);
+        super.update(elapsed);
+    }
 
-		animate();
+    public function clear() {
+        removeFloor();
+        for (point in this.points) {
+            point.removeWall();
+        }
+    }
 
-		super.update(elapsed);
-	}
+    public function getFloor() {
+        return this.floor;
+    }
 
-	public function clear() {
-		setWall(false);
-		setFloor(false);
-	}
+    public function getNeighbor(neighbor:TileNeighbors):EditorTile {
+        return this.neighborTiles[neighbor];
+    }
 
-	public function getNeighbour(neighbor:TileNeighbors):EditorTile {
-		return this.neighbors[neighbor];
-	}
+    public function getPoint(pointPosition:PointPositions):EditorPoint {
+        return this.points[pointPosition];
+    }
 
-	public function handleInput(tool:Tool):Bool {
-		if (hovering) {
-			if (FlxG.mouse.pressed) {
-				switch (tool) {
-					case REMOVE:
-						clear();
-					case FLOOR:
-						setFloor(true);
-					case WALL:
-						setWall(true);
-				}
+    public function handleInput(tool:Tool):Bool {
+        if (hovering) {
+            if (FlxG.mouse.pressed) {
+                switch (tool) {
+                case REMOVE:
+                    clear();
+                    return true;
+                case FLOOR:
+                    addFloor();
+                    return true;
+                default:
+                    // do nothing
+                }
+            } else if (FlxG.mouse.pressedRight) {
+                switch (tool) {
+                case REMOVE:
+                    clear();
+                    return true;
+                case FLOOR:
+                    removeFloor();
+                    return true;
+                default:
+                    // do nothing
+                }
+            }
+        }
 
-				return true;
-			} else if (FlxG.mouse.pressedRight) {
-				switch (tool) {
-					case REMOVE:
-						clear();
-					case FLOOR:
-						setFloor(false);
-					case WALL:
-						setWall(false);
-				}
+        return false;
+    }
 
-				return true;
-			}
-		}
+    public function hasFloor():Bool {
+        return this.floor != null;
+    }
 
-		return false;
-	}
+    public function isNeighborActive(neighbor:TileNeighbors):Bool {
+        return this.neighborTiles[neighbor] != null && this.neighborTiles[neighbor].isActive();
+    }
 
-	public function hasFloor():Bool {
-		return this.floorActive;
-	}
+    public function isActive():Bool {
+        return hasFloor();
+    }
 
-	public function hasWall():Bool {
-		return this.wallActive;
-	}
+    public function populate() {
+        this.neighborTiles[TILE_NEIGHBOR_CORNER_UP] = parent.getEditorTile(col - 1, row - 1);
+        this.neighborTiles[TILE_NEIGHBOR_CORNER_RIGHT] = parent.getEditorTile(col + 1, row - 1);
+        this.neighborTiles[TILE_NEIGHBOR_CORNER_DOWN] = parent.getEditorTile(col + 1, row + 1);
+        this.neighborTiles[TILE_NEIGHBOR_CORNER_LEFT] = parent.getEditorTile(col - 1, row + 1);
+        this.neighborTiles[TILE_NEIGHBOR_SIDE_UP] = parent.getEditorTile(col, row - 1);
+        this.neighborTiles[TILE_NEIGHBOR_SIDE_RIGHT] = parent.getEditorTile(col + 1, row);
+        this.neighborTiles[TILE_NEIGHBOR_SIDE_DOWN] = parent.getEditorTile(col, row + 1);
+        this.neighborTiles[TILE_NEIGHBOR_SIDE_LEFT] = parent.getEditorTile(col - 1, row);
 
-	public function setFloor(selected:Bool) {
-		if (this.floorActive != selected) {
-			if (!selected) {
-				setWall(false);
-			}
+        this.points[POINT_CORNER_UP] = if (getNeighborPoint(TILE_NEIGHBOR_SIDE_LEFT, POINT_CORNER_RIGHT) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_SIDE_LEFT, POINT_CORNER_RIGHT);
+        } else if (getNeighborPoint(TILE_NEIGHBOR_CORNER_UP, POINT_CORNER_DOWN) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_CORNER_UP, POINT_CORNER_DOWN);
+        } else if (getNeighborPoint(TILE_NEIGHBOR_SIDE_UP, POINT_CORNER_LEFT) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_SIDE_UP, POINT_CORNER_LEFT);
+        } else {
+            new EditorPoint(this.x
+                + (EDITOR_TILE_WIDTH - EditorPoint.EDITOR_POINT_WIDTH) / 2,
+                this.y
+                - (EditorPoint.EDITOR_POINT_HEIGHT) / 2
+                + EditorPoint.EDITOR_POINT_Y_OFFSET, this, TILE_CORNER_DOWN);
+        }
 
-			this.floorActive = selected;
-			this.floor.visible = selected;
+        this.points[POINT_CORNER_RIGHT] = if (getNeighborPoint(TILE_NEIGHBOR_SIDE_UP, POINT_CORNER_DOWN) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_SIDE_UP, POINT_CORNER_DOWN);
+        } else if (getNeighborPoint(TILE_NEIGHBOR_CORNER_RIGHT, POINT_CORNER_LEFT) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_CORNER_RIGHT, POINT_CORNER_LEFT);
+        } else if (getNeighborPoint(TILE_NEIGHBOR_SIDE_RIGHT, POINT_CORNER_UP) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_SIDE_RIGHT, POINT_CORNER_UP);
+        } else {
+            new EditorPoint(this.x + EDITOR_TILE_WIDTH - (EditorPoint.EDITOR_POINT_WIDTH) / 2, this.y + EditorPoint.EDITOR_POINT_Y_OFFSET, this,
+                TILE_CORNER_LEFT);
+        }
 
-			this.floor.updateGraphics();
-			updateNeighborsGraphics();
-		}
-	}
+        this.points[POINT_CORNER_DOWN] = if (getNeighborPoint(TILE_NEIGHBOR_SIDE_RIGHT, POINT_CORNER_LEFT) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_SIDE_RIGHT, POINT_CORNER_LEFT);
+        } else if (getNeighborPoint(TILE_NEIGHBOR_CORNER_DOWN, POINT_CORNER_UP) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_CORNER_DOWN, POINT_CORNER_UP);
+        } else if (getNeighborPoint(TILE_NEIGHBOR_SIDE_DOWN, POINT_CORNER_RIGHT) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_SIDE_DOWN, POINT_CORNER_RIGHT);
+        } else {
+            new EditorPoint(this.x
+                + (EDITOR_TILE_WIDTH - EditorPoint.EDITOR_POINT_WIDTH) / 2,
+                this.y
+                + EDITOR_TILE_HEIGHT
+                - (EditorPoint.EDITOR_POINT_HEIGHT) / 2
+                + EditorPoint.EDITOR_POINT_Y_OFFSET, this, TILE_CORNER_UP);
+        }
 
-	public function setWall(selected:Bool) {
-		if (this.floorActive) {
-			if (this.wallActive != selected) {
-				this.wallActive = selected;
-				this.wall.visible = selected;
-				this.wall.updateGraphics();
-				updateNeighborsGraphics();
-			}
-		}
-	}
+        this.points[POINT_CORNER_LEFT] = if (getNeighborPoint(TILE_NEIGHBOR_SIDE_DOWN, POINT_CORNER_UP) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_SIDE_DOWN, POINT_CORNER_UP);
+        } else if (getNeighborPoint(TILE_NEIGHBOR_CORNER_LEFT, POINT_CORNER_RIGHT) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_CORNER_LEFT, POINT_CORNER_RIGHT);
+        } else if (getNeighborPoint(TILE_NEIGHBOR_SIDE_LEFT, POINT_CORNER_DOWN) != null) {
+            getNeighborPoint(TILE_NEIGHBOR_SIDE_LEFT, POINT_CORNER_DOWN);
+        } else {
+            new EditorPoint(this.x - (EditorPoint.EDITOR_POINT_WIDTH) / 2, this.y + EditorPoint.EDITOR_POINT_Y_OFFSET, this, TILE_CORNER_RIGHT);
+        }
+    }
 
-	public function isNeighbourActive(neighbor:TileNeighbors):Bool {
-		return this.neighbors[neighbor] != null && this.neighbors[neighbor].isActive();
-	}
+    function getNeighborPoint(tileNeighbor:TileNeighbors, pointPosition:PointPositions):EditorPoint {
+        var neighbor = this.neighborTiles[tileNeighbor];
 
-	public function isActive():Bool {
-		return this.floorActive || this.wallActive;
-	}
+        if (neighbor != null) {
+            return neighbor.getPoint(pointPosition);
+        }
 
-	public function populateNeighbours() {
-		this.neighbors[TILE_CORNER_UP] = parent.getEditorTile(col - 1, row - 1);
-		this.neighbors[TILE_CORNER_RIGHT] = parent.getEditorTile(col + 1, row - 1);
-		this.neighbors[TILE_CORNER_DOWN] = parent.getEditorTile(col + 1, row + 1);
-		this.neighbors[TILE_CORNER_LEFT] = parent.getEditorTile(col - 1, row + 1);
-		this.neighbors[TILE_SIDE_UP] = parent.getEditorTile(col, row - 1);
-		this.neighbors[TILE_SIDE_RIGHT] = parent.getEditorTile(col + 1, row);
-		this.neighbors[TILE_SIDE_DOWN] = parent.getEditorTile(col, row + 1);
-		this.neighbors[TILE_SIDE_LEFT] = parent.getEditorTile(col - 1, row);
-	}
+        return null;
+    }
 
-	public function updateGraphics() {
-		if (this.floorActive) {
-			this.floor.updateGraphics();
-		}
+    public function updateGraphics() {
+        if (hasFloor()) {
+            this.floor.updateGraphics();
+        }
+    }
 
-		if (this.wallActive) {
-			this.wall.updateGraphics();
-		}
-	}
+    function animate() {
+        if (this.hovering) {
+            animation.play("hover");
+        } else {
+            animation.play("unselected");
+        }
+    }
 
-	function updateNeighborsGraphics() {
-		for (neighbor in this.neighbors.keys())
-			if (isNeighbourActive(neighbor))
-				this.neighbors[neighbor].updateGraphics();
-	}
+    function addFloor() {
+        if (hasFloor()) {
+            return;
+        }
 
-	function animate() {
-		if (this.hovering) {
-			animation.play("hover");
-		} else {
-			animation.play("unselected");
-		}
-	}
+        this.floor = new Floor(x, y - 16, this);
+        this.parent.floors.add(floor);
+        this.parent.floors.sort(FlxSort.byY);
+
+        updateGraphics();
+        updateNeighborsGraphics();
+    }
+
+    function removeFloor() {
+        if (!hasFloor()) {
+            return;
+        }
+
+        this.parent.floors.remove(this.floor, true);
+        this.floor.kill();
+        this.floor = null;
+
+        updateNeighborsGraphics();
+    }
+
+    function updateNeighborsGraphics() {
+        for (neighbor in this.neighborTiles) {
+            if (neighbor != null) {
+                neighbor.updateGraphics();
+            }
+        }
+    }
 }

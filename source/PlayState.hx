@@ -7,117 +7,126 @@ import haxe.ds.Vector;
 import hud.HUD;
 
 enum Tool {
-	REMOVE;
-	FLOOR;
-	WALL;
+    REMOVE;
+    FLOOR;
+    WALL;
 }
 
 class PlayState extends FlxState {
-	public static inline var TILES_COLS = 16;
-	public static inline var TILES_ROWS = 16;
+    public static inline var TILES_COLS = 16;
+    public static inline var TILES_ROWS = 16;
 
-	public var currentTool:Tool = REMOVE;
-	public var editorTiles:FlxTypedGroup<EditorTile>;
-	public var editorTilesVec:Vector<Vector<EditorTile>>;
-	public var floors:FlxTypedGroup<Floor>;
-	public var walls:FlxTypedGroup<Wall>;
+    public var currentTool:Tool = REMOVE;
+    public var editorTiles:FlxTypedGroup<EditorTile>;
+    public var editorTilesVec:Vector<Vector<EditorTile>>;
+    public var floors:FlxTypedGroup<Floor>;
+    public var editorPoints:FlxTypedGroup<EditorPoint>;
+    public var walls:FlxTypedGroup<Wall>;
 
-	public var hud:HUD;
+    public var hud:HUD;
 
-	override public function create() {
-		super.create();
+    override public function create() {
+        super.create();
 
-		FlxG.camera.zoom = 2;
+        FlxG.camera.zoom = 2;
 
-		this.editorTiles = new FlxTypedGroup<EditorTile>();
-		this.editorTilesVec = new Vector<Vector<EditorTile>>(TILES_COLS);
-		this.floors = new FlxTypedGroup<Floor>();
-		this.walls = new FlxTypedGroup<Wall>();
+        this.editorTiles = new FlxTypedGroup<EditorTile>();
+        this.editorTilesVec = new Vector<Vector<EditorTile>>(TILES_COLS);
+        this.editorPoints = new FlxTypedGroup<EditorPoint>();
+        this.floors = new FlxTypedGroup<Floor>();
+        this.walls = new FlxTypedGroup<Wall>();
 
-		for (col in 0...TILES_COLS) {
-			this.editorTilesVec[col] = new Vector<EditorTile>(TILES_ROWS);
-		}
+        for (col in 0...TILES_COLS) {
+            this.editorTilesVec[col] = new Vector<EditorTile>(TILES_ROWS);
+        }
 
-		var editor_tile:EditorTile;
-		for (row in 0...TILES_ROWS) {
-			for (col in 0...TILES_COLS) {
-				editor_tile = new EditorTile(col, row);
-				this.editorTiles.add(editor_tile);
-				this.editorTilesVec[col][row] = editor_tile;
-			}
-		}
+        var editorTile:EditorTile;
+        for (row in 0...TILES_ROWS) {
+            for (col in 0...TILES_COLS) {
+                editorTile = new EditorTile(col, row);
+                this.editorTiles.add(editorTile);
+                this.editorTilesVec[col][row] = editorTile;
+            }
+        }
 
-		for (row in 0...TILES_ROWS) {
-			for (col in 0...TILES_COLS) {
-				this.editorTilesVec[col][row].populateNeighbours();
-			}
-		}
+        for (row in 0...TILES_ROWS) {
+            for (col in 0...TILES_COLS) {
+                this.editorTilesVec[col][row].populate();
+            }
+        }
 
-		add(editorTiles);
-		add(floors);
-		add(walls);
+        add(editorTiles);
+        add(editorPoints);
+        add(floors);
+        add(walls);
 
-		this.hud = new HUD(this);
-		this.hud.addButton("assets/images/hud/remove.png", (button) -> {
-			if (button.isSelected()) {
-				this.currentTool = REMOVE;
-			}
-		});
-		this.hud.addButton("assets/images/hud/floor.png", (button) -> {
-			if (button.isSelected()) {
-				this.currentTool = FLOOR;
-			}
-		});
-		this.hud.addButton("assets/images/hud/wall.png", (button) -> {
-			if (button.isSelected()) {
-				this.currentTool = WALL;
-			}
-		});
+        this.hud = new HUD(this);
+        this.hud.addButton("assets/images/hud/remove.png", (button) -> {
+            if (button.isSelected()) {
+                this.currentTool = REMOVE;
+            }
+        });
+        this.hud.addButton("assets/images/hud/floor.png", (button) -> {
+            if (button.isSelected()) {
+                this.currentTool = FLOOR;
+            }
+        });
+        this.hud.addButton("assets/images/hud/wall.png", (button) -> {
+            if (button.isSelected()) {
+                this.currentTool = WALL;
+            }
+        });
 
-		add(hud);
-	}
+        add(hud);
+    }
 
-	override public function update(elapsed:Float) {
-		handleInput();
+    override public function update(elapsed:Float) {
+        handleInput();
 
-		super.update(elapsed);
-	}
+        super.update(elapsed);
+    }
 
-	public function getEditorTile(col:Int, row:Int) {
-		if (editorTilesVec[col] != null)
-			return editorTilesVec[col][row];
+    public function getEditorTile(col:Int, row:Int) {
+        if (editorTilesVec[col] != null)
+            return editorTilesVec[col][row];
 
-		return null;
-	}
+        return null;
+    }
 
-	public function handleInput() {
-		var mouseWorldPos = FlxG.mouse.getWorldPosition();
+    public function handleInput() {
+        var mouseWorldPos = FlxG.mouse.getWorldPosition();
 
-		if (this.hud.handleInput()) {
-			return;
-		}
+        if (this.hud.handleInput()) {
+            return;
+        }
 
-		for (tile in this.editorTiles) {
-			if (tile.handleInput(currentTool)) {
-				return;
-			}
-		}
+        for (point in this.editorPoints) {
+            if (point.handleInput(currentTool)) {
+                return;
+            }
+        }
 
-		if (FlxG.mouse.pressedMiddle && !FlxG.mouse.justPressedMiddle) {
-			FlxG.camera.scroll.x -= FlxG.mouse.deltaScreenX;
-			FlxG.camera.scroll.y -= FlxG.mouse.deltaScreenY;
-		}
+        for (tile in this.editorTiles) {
+            if (tile.handleInput(currentTool)) {
+                return;
+            }
+        }
 
-		if (FlxG.keys.pressed.CONTROL) {
-			var oldZoom = FlxG.camera.zoom;
-			var newZoom = Math.min(4, Math.max(1, oldZoom + FlxG.mouse.wheel));
+        if (FlxG.mouse.pressedMiddle && !FlxG.mouse.justPressedMiddle) {
+            FlxG.camera.scroll.x -= FlxG.mouse.deltaScreenX;
+            FlxG.camera.scroll.y -= FlxG.mouse.deltaScreenY;
+        }
 
-			if (oldZoom != newZoom) {
-				FlxG.camera.zoom = newZoom;
-				var newMouseWorldPos = FlxG.mouse.getWorldPosition();
-				var diffPos = newMouseWorldPos.subtractPoint(mouseWorldPos);
-				FlxG.camera.scroll.subtractPoint(diffPos);
-			}
-		}
-	}
+        if (FlxG.keys.pressed.CONTROL) {
+            var oldZoom = FlxG.camera.zoom;
+            var newZoom = Math.min(4, Math.max(1, oldZoom + FlxG.mouse.wheel));
+
+            if (oldZoom != newZoom) {
+                FlxG.camera.zoom = newZoom;
+                var newMouseWorldPos = FlxG.mouse.getWorldPosition();
+                var diffPos = newMouseWorldPos.subtractPoint(mouseWorldPos);
+                FlxG.camera.scroll.subtractPoint(diffPos);
+            }
+        }
+    }
 }
