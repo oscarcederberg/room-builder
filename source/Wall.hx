@@ -6,7 +6,7 @@ import openfl.display.BitmapData;
 import openfl.geom.Point;
 
 enum Fragment {
-    WALL_NO;
+    WALL_NONE;
     WALL_SINGLE_1;
     WALL_SINGLE_2;
     WALL_SINGLE_3;
@@ -79,7 +79,7 @@ class Wall extends FlxSprite {
         } else if (left) {
             stampFragment(WALL_SINGLE_4);
         } else {
-            stampFragment(WALL_NO);
+            stampFragment(WALL_NONE);
         }
     }
 

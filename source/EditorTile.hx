@@ -133,55 +133,10 @@ class EditorTile extends FlxSprite {
         this.neighborTiles[TILE_NEIGHBOR_SIDE_DOWN] = parent.getEditorTile(col, row + 1);
         this.neighborTiles[TILE_NEIGHBOR_SIDE_LEFT] = parent.getEditorTile(col - 1, row);
 
-        this.points[POINT_CORNER_UP] = if (getNeighborPoint(TILE_NEIGHBOR_SIDE_LEFT, POINT_CORNER_RIGHT) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_SIDE_LEFT, POINT_CORNER_RIGHT);
-        } else if (getNeighborPoint(TILE_NEIGHBOR_CORNER_UP, POINT_CORNER_DOWN) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_CORNER_UP, POINT_CORNER_DOWN);
-        } else if (getNeighborPoint(TILE_NEIGHBOR_SIDE_UP, POINT_CORNER_LEFT) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_SIDE_UP, POINT_CORNER_LEFT);
-        } else {
-            new EditorPoint(this.x
-                + (EDITOR_TILE_WIDTH - EditorPoint.EDITOR_POINT_WIDTH) / 2,
-                this.y
-                - (EditorPoint.EDITOR_POINT_HEIGHT) / 2
-                + EditorPoint.EDITOR_POINT_Y_OFFSET, this, TILE_CORNER_DOWN);
-        }
-
-        this.points[POINT_CORNER_RIGHT] = if (getNeighborPoint(TILE_NEIGHBOR_SIDE_UP, POINT_CORNER_DOWN) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_SIDE_UP, POINT_CORNER_DOWN);
-        } else if (getNeighborPoint(TILE_NEIGHBOR_CORNER_RIGHT, POINT_CORNER_LEFT) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_CORNER_RIGHT, POINT_CORNER_LEFT);
-        } else if (getNeighborPoint(TILE_NEIGHBOR_SIDE_RIGHT, POINT_CORNER_UP) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_SIDE_RIGHT, POINT_CORNER_UP);
-        } else {
-            new EditorPoint(this.x + EDITOR_TILE_WIDTH - (EditorPoint.EDITOR_POINT_WIDTH) / 2, this.y + EditorPoint.EDITOR_POINT_Y_OFFSET, this,
-                TILE_CORNER_LEFT);
-        }
-
-        this.points[POINT_CORNER_DOWN] = if (getNeighborPoint(TILE_NEIGHBOR_SIDE_RIGHT, POINT_CORNER_LEFT) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_SIDE_RIGHT, POINT_CORNER_LEFT);
-        } else if (getNeighborPoint(TILE_NEIGHBOR_CORNER_DOWN, POINT_CORNER_UP) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_CORNER_DOWN, POINT_CORNER_UP);
-        } else if (getNeighborPoint(TILE_NEIGHBOR_SIDE_DOWN, POINT_CORNER_RIGHT) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_SIDE_DOWN, POINT_CORNER_RIGHT);
-        } else {
-            new EditorPoint(this.x
-                + (EDITOR_TILE_WIDTH - EditorPoint.EDITOR_POINT_WIDTH) / 2,
-                this.y
-                + EDITOR_TILE_HEIGHT
-                - (EditorPoint.EDITOR_POINT_HEIGHT) / 2
-                + EditorPoint.EDITOR_POINT_Y_OFFSET, this, TILE_CORNER_UP);
-        }
-
-        this.points[POINT_CORNER_LEFT] = if (getNeighborPoint(TILE_NEIGHBOR_SIDE_DOWN, POINT_CORNER_UP) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_SIDE_DOWN, POINT_CORNER_UP);
-        } else if (getNeighborPoint(TILE_NEIGHBOR_CORNER_LEFT, POINT_CORNER_RIGHT) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_CORNER_LEFT, POINT_CORNER_RIGHT);
-        } else if (getNeighborPoint(TILE_NEIGHBOR_SIDE_LEFT, POINT_CORNER_DOWN) != null) {
-            getNeighborPoint(TILE_NEIGHBOR_SIDE_LEFT, POINT_CORNER_DOWN);
-        } else {
-            new EditorPoint(this.x - (EditorPoint.EDITOR_POINT_WIDTH) / 2, this.y + EditorPoint.EDITOR_POINT_Y_OFFSET, this, TILE_CORNER_RIGHT);
-        }
+        this.points[POINT_CORNER_UP] = parent.getEditorPoint(col, row);
+        this.points[POINT_CORNER_RIGHT] = parent.getEditorPoint(col + 1, row);
+        this.points[POINT_CORNER_DOWN] = parent.getEditorPoint(col + 1, row + 1);
+        this.points[POINT_CORNER_LEFT] = parent.getEditorPoint(col, row + 1);
     }
 
     function getNeighborPoint(tileNeighbor:TileNeighbors, pointPosition:PointPositions):EditorPoint {

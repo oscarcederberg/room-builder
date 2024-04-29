@@ -27,39 +27,26 @@ class EditorPoint extends FlxSprite {
     public static final EDITOR_POINT_HEIGHT = 16;
     public static final EDITOR_POINT_Y_OFFSET = 0;
 
+    public var col:Int;
+    public var row:Int;
+
     var parent:PlayState = cast(FlxG.state, PlayState);
     var neighborPoints:Map<PointNeighbors, EditorPoint> = new Map();
     var tiles:Map<TilePositions, EditorTile> = new Map();
 
     var wall:Wall = null;
 
-    public function new(x:Float, y:Float, tile:EditorTile, tilePosition:TilePositions) {
+    public function new(col:Int, row:Int) {
+        var x, y:Float;
+
+        this.col = col;
+        this.row = row;
+        x = col * EditorTile.EDITOR_TILE_WIDTH / 2
+            - (row * EditorTile.EDITOR_TILE_WIDTH / 2)
+            + (EditorTile.EDITOR_TILE_WIDTH - EditorPoint.EDITOR_POINT_WIDTH) / 2;
+        y = row * EditorTile.EDITOR_TILE_HEIGHT / 2 + (col * EditorTile.EDITOR_TILE_HEIGHT / 2) - (EditorPoint.EDITOR_POINT_HEIGHT) / 2
+            + EditorPoint.EDITOR_POINT_Y_OFFSET;
         super(x, y);
-
-        this.parent.editorPoints.add(this);
-
-        switch tilePosition {
-        case TILE_CORNER_UP:
-            this.tiles[TILE_CORNER_UP] = tile;
-            this.tiles[TILE_CORNER_RIGHT] = tile.getNeighbor(TILE_NEIGHBOR_SIDE_RIGHT);
-            this.tiles[TILE_CORNER_DOWN] = tile.getNeighbor(TILE_NEIGHBOR_CORNER_DOWN);
-            this.tiles[TILE_CORNER_LEFT] = tile.getNeighbor(TILE_NEIGHBOR_SIDE_LEFT);
-        case TILE_CORNER_RIGHT:
-            this.tiles[TILE_CORNER_UP] = tile.getNeighbor(TILE_NEIGHBOR_SIDE_LEFT);
-            this.tiles[TILE_CORNER_RIGHT] = tile;
-            this.tiles[TILE_CORNER_DOWN] = tile.getNeighbor(TILE_NEIGHBOR_SIDE_DOWN);
-            this.tiles[TILE_CORNER_LEFT] = tile.getNeighbor(TILE_NEIGHBOR_CORNER_LEFT);
-        case TILE_CORNER_DOWN:
-            this.tiles[TILE_CORNER_UP] = tile.getNeighbor(TILE_NEIGHBOR_CORNER_UP);
-            this.tiles[TILE_CORNER_RIGHT] = tile.getNeighbor(TILE_NEIGHBOR_SIDE_UP);
-            this.tiles[TILE_CORNER_DOWN] = tile;
-            this.tiles[TILE_CORNER_LEFT] = tile.getNeighbor(TILE_NEIGHBOR_SIDE_LEFT);
-        case TILE_CORNER_LEFT:
-            this.tiles[TILE_CORNER_UP] = tile.getNeighbor(TILE_NEIGHBOR_SIDE_UP);
-            this.tiles[TILE_CORNER_RIGHT] = tile.getNeighbor(TILE_NEIGHBOR_CORNER_RIGHT);
-            this.tiles[TILE_CORNER_DOWN] = tile.getNeighbor(TILE_NEIGHBOR_SIDE_RIGHT);
-            this.tiles[TILE_CORNER_LEFT] = tile;
-        }
 
         loadGraphic("assets/images/editor_point.png", false, EDITOR_POINT_GRAPHICS_WIDTH, EDITOR_POINT_HEIGHT);
     }
@@ -110,6 +97,10 @@ class EditorPoint extends FlxSprite {
 
         var floorExists = false;
         for (tile in this.tiles) {
+            if (tile == null) {
+                continue;
+            }
+
             if (tile.hasFloor()) {
                 floorExists = true;
                 break;
@@ -130,6 +121,18 @@ class EditorPoint extends FlxSprite {
 
     public function hasWall():Bool {
         return this.wall != null;
+    }
+
+    public function populate() {
+        this.neighborPoints[POINT_NEIGHBOR_UP] = parent.getEditorPoint(col, row - 1);
+        this.neighborPoints[POINT_NEIGHBOR_RIGHT] = parent.getEditorPoint(col + 1, row);
+        this.neighborPoints[POINT_NEIGHBOR_DOWN] = parent.getEditorPoint(col, row + 1);
+        this.neighborPoints[POINT_NEIGHBOR_LEFT] = parent.getEditorPoint(col - 1, row);
+
+        this.tiles[TILE_CORNER_UP] = parent.getEditorTile(col - 1, row - 1);
+        this.tiles[TILE_CORNER_RIGHT] = parent.getEditorTile(col, row - 1);
+        this.tiles[TILE_CORNER_DOWN] = parent.getEditorTile(col, row);
+        this.tiles[TILE_CORNER_LEFT] = parent.getEditorTile(col - 1, row);
     }
 
     public function removeWall() {

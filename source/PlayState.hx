@@ -21,6 +21,7 @@ class PlayState extends FlxState {
     public var editorTilesVec:Vector<Vector<EditorTile>>;
     public var floors:FlxTypedGroup<Floor>;
     public var editorPoints:FlxTypedGroup<EditorPoint>;
+    public var editorPointsVec:Vector<Vector<EditorPoint>>;
     public var walls:FlxTypedGroup<Wall>;
 
     public var hud:HUD;
@@ -33,11 +34,16 @@ class PlayState extends FlxState {
         this.editorTiles = new FlxTypedGroup<EditorTile>();
         this.editorTilesVec = new Vector<Vector<EditorTile>>(TILES_COLS);
         this.editorPoints = new FlxTypedGroup<EditorPoint>();
+        this.editorPointsVec = new Vector<Vector<EditorPoint>>(TILES_COLS + 1);
         this.floors = new FlxTypedGroup<Floor>();
         this.walls = new FlxTypedGroup<Wall>();
 
         for (col in 0...TILES_COLS) {
             this.editorTilesVec[col] = new Vector<EditorTile>(TILES_ROWS);
+        }
+
+        for (col in 0...(TILES_COLS + 1)) {
+            this.editorPointsVec[col] = new Vector<EditorPoint>(TILES_ROWS + 1);
         }
 
         var editorTile:EditorTile;
@@ -49,9 +55,24 @@ class PlayState extends FlxState {
             }
         }
 
+        var editorPoint:EditorPoint;
+        for (row in 0...(TILES_ROWS + 1)) {
+            for (col in 0...(TILES_COLS + 1)) {
+                editorPoint = new EditorPoint(col, row);
+                this.editorPoints.add(editorPoint);
+                this.editorPointsVec[col][row] = editorPoint;
+            }
+        }
+
         for (row in 0...TILES_ROWS) {
             for (col in 0...TILES_COLS) {
                 this.editorTilesVec[col][row].populate();
+            }
+        }
+
+        for (row in 0...(TILES_ROWS + 1)) {
+            for (col in 0...(TILES_COLS + 1)) {
+                this.editorPointsVec[col][row].populate();
             }
         }
 
@@ -89,6 +110,13 @@ class PlayState extends FlxState {
     public function getEditorTile(col:Int, row:Int) {
         if (editorTilesVec[col] != null)
             return editorTilesVec[col][row];
+
+        return null;
+    }
+
+    public function getEditorPoint(col:Int, row:Int) {
+        if (editorPointsVec[col] != null)
+            return editorPointsVec[col][row];
 
         return null;
     }
