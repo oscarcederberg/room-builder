@@ -3,9 +3,11 @@ package;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.util.FlxSort;
 import haxe.ds.Vector;
 import hud.HUD;
 import structures.Floor;
+import structures.RoomStructure;
 import structures.Wall;
 
 enum Tool {
@@ -19,14 +21,13 @@ class PlayState extends FlxState {
     public static inline var TILES_ROWS = 16;
 
     public var currentTool:Tool = REMOVE;
-    public var floors:FlxTypedGroup<Floor>;
-    public var walls:FlxTypedGroup<Wall>;
     public var hud:HUD;
 
     var editorTiles:FlxTypedGroup<EditorTile>;
     var editorTilesVec:Vector<Vector<EditorTile>>;
     var editorPoints:FlxTypedGroup<EditorPoint>;
     var editorPointsVec:Vector<Vector<EditorPoint>>;
+    var structures:FlxTypedGroup<RoomStructure>;
 
     override public function create() {
         super.create();
@@ -37,8 +38,7 @@ class PlayState extends FlxState {
         this.editorTilesVec = new Vector<Vector<EditorTile>>(TILES_COLS);
         this.editorPoints = new FlxTypedGroup<EditorPoint>();
         this.editorPointsVec = new Vector<Vector<EditorPoint>>(TILES_COLS + 1);
-        this.floors = new FlxTypedGroup<Floor>();
-        this.walls = new FlxTypedGroup<Wall>();
+        this.structures = new FlxTypedGroup<RoomStructure>();
 
         for (col in 0...TILES_COLS) {
             this.editorTilesVec[col] = new Vector<EditorTile>(TILES_ROWS);
@@ -80,8 +80,7 @@ class PlayState extends FlxState {
 
         add(editorTiles);
         add(editorPoints);
-        add(floors);
-        add(walls);
+        add(structures);
 
         this.hud = new HUD(this);
         this.hud.addButton("assets/images/hud/remove.png", (button) -> {
@@ -107,6 +106,11 @@ class PlayState extends FlxState {
         handleInput();
 
         super.update(elapsed);
+    }
+
+    public function addStructure(structure:RoomStructure) {
+        this.structures.add(structure);
+        this.structures.sort((order, a, b) -> FlxSort.byValues(order, a.getDepth(), b.getDepth()));
     }
 
     public function getEditorTile(col:Int, row:Int) {
@@ -158,5 +162,10 @@ class PlayState extends FlxState {
                 FlxG.camera.scroll.subtractPoint(diffPos);
             }
         }
+    }
+
+    public function removeStructure(structure:RoomStructure) {
+        this.structures.remove(structure, true);
+        this.structures.sort((order, a, b) -> FlxSort.byValues(order, a.getDepth(), b.getDepth()));
     }
 }

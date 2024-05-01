@@ -3,7 +3,6 @@ package structures;
 import EditorTile.PointPositions;
 import EditorTile.TileNeighbors;
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.system.FlxAssets;
 import flixel.util.FlxColor;
 import openfl.display.BitmapData;
@@ -53,7 +52,26 @@ class Floor extends RoomStructure {
         super.kill();
     }
 
-    public function getNeighbor(neighbor:TileNeighbors):Floor {
+    public function getDepth():Int {
+        return 100 * (this.tile.col + this.tile.row);
+    }
+
+    public function updateGraphics() {
+        makeGraphic(FLOOR_WIDTH, FLOOR_HEIGHT, FlxColor.TRANSPARENT, true);
+
+        stampFragment(FLOOR_MID);
+
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_UP, TILE_NEIGHBOR_CORNER_UP, TILE_NEIGHBOR_SIDE_LEFT, FLOOR_UP_1, FLOOR_UP_2, FLOOR_UP_3, FLOOR_UP_4,
+            FLOOR_UP_5);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_RIGHT, TILE_NEIGHBOR_CORNER_RIGHT, TILE_NEIGHBOR_SIDE_UP, FLOOR_RIGHT_1, FLOOR_RIGHT_2, FLOOR_RIGHT_3,
+            FLOOR_RIGHT_4, FLOOR_RIGHT_5);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_DOWN, TILE_NEIGHBOR_CORNER_DOWN, TILE_NEIGHBOR_SIDE_RIGHT, FLOOR_DOWN_1, FLOOR_DOWN_2, FLOOR_DOWN_3,
+            FLOOR_DOWN_4, FLOOR_DOWN_5);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_LEFT, TILE_NEIGHBOR_CORNER_LEFT, TILE_NEIGHBOR_SIDE_DOWN, FLOOR_LEFT_1, FLOOR_LEFT_2, FLOOR_LEFT_3,
+            FLOOR_LEFT_4, FLOOR_LEFT_5);
+    }
+
+    function getNeighbor(neighbor:TileNeighbors):Floor {
         var neighbor = tile.getNeighbor(neighbor);
 
         if (neighbor != null) {
@@ -63,7 +81,7 @@ class Floor extends RoomStructure {
         return null;
     }
 
-    public function neighborHasFloor(neighbor:TileNeighbors):Bool {
+    function neighborHasFloor(neighbor:TileNeighbors):Bool {
         var neighbor = tile.getNeighbor(neighbor);
 
         if (neighbor != null) {
@@ -73,22 +91,18 @@ class Floor extends RoomStructure {
         return false;
     }
 
-    public function stampFragment(fragment:FloorFragment) {
-        this.graphic.bitmap.copyPixels(bitmaps[fragment], bitmaps[fragment].rect, new Point(0, 0), null, null, true);
+    function pointHasWall(point:PointPositions):Bool {
+        var point = tile.getPoint(point);
+
+        if (point != null) {
+            return point.hasWall();
+        }
+
+        return false;
     }
 
-    public function updateGraphics() {
-        makeGraphic(FLOOR_WIDTH, FLOOR_HEIGHT, FlxColor.TRANSPARENT, true);
-
-        stampFragment(FLOOR_MID);
-        updateCornerGraphics(TILE_NEIGHBOR_SIDE_UP, TILE_NEIGHBOR_CORNER_UP, TILE_NEIGHBOR_SIDE_LEFT, FLOOR_UP_1, FLOOR_UP_2, FLOOR_UP_3, FLOOR_UP_4,
-            FLOOR_UP_5);
-        updateCornerGraphics(TILE_NEIGHBOR_SIDE_RIGHT, TILE_NEIGHBOR_CORNER_RIGHT, TILE_NEIGHBOR_SIDE_UP, FLOOR_RIGHT_1, FLOOR_RIGHT_2, FLOOR_RIGHT_3,
-            FLOOR_RIGHT_4, FLOOR_RIGHT_5);
-        updateCornerGraphics(TILE_NEIGHBOR_SIDE_DOWN, TILE_NEIGHBOR_CORNER_DOWN, TILE_NEIGHBOR_SIDE_RIGHT, FLOOR_DOWN_1, FLOOR_DOWN_2, FLOOR_DOWN_3,
-            FLOOR_DOWN_4, FLOOR_DOWN_5);
-        updateCornerGraphics(TILE_NEIGHBOR_SIDE_LEFT, TILE_NEIGHBOR_CORNER_LEFT, TILE_NEIGHBOR_SIDE_DOWN, FLOOR_LEFT_1, FLOOR_LEFT_2, FLOOR_LEFT_3,
-            FLOOR_LEFT_4, FLOOR_LEFT_5);
+    function stampFragment(fragment:FloorFragment) {
+        this.graphic.bitmap.copyPixels(bitmaps[fragment], bitmaps[fragment].rect, new Point(0, 0), null, null, true);
     }
 
     function updateCornerGraphics(side_a:TileNeighbors, corner:TileNeighbors, side_b:TileNeighbors, fragment_1:FloorFragment, fragment_2:FloorFragment,

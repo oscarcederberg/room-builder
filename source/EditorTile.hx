@@ -116,14 +116,6 @@ class EditorTile extends FlxSprite {
         return this.floor != null;
     }
 
-    public function isNeighborActive(neighbor:TileNeighbors):Bool {
-        return this.neighborTiles[neighbor] != null && this.neighborTiles[neighbor].isActive();
-    }
-
-    public function isActive():Bool {
-        return hasFloor();
-    }
-
     public function populate() {
         this.neighborTiles[TILE_NEIGHBOR_CORNER_UP] = parent.getEditorTile(col - 1, row - 1);
         this.neighborTiles[TILE_NEIGHBOR_CORNER_RIGHT] = parent.getEditorTile(col + 1, row - 1);
@@ -170,8 +162,7 @@ class EditorTile extends FlxSprite {
         }
 
         this.floor = new Floor(x, y - 16, this);
-        this.parent.floors.add(floor);
-        this.parent.floors.sort(FlxSort.byY);
+        this.parent.addStructure(this.floor);
 
         updateGraphics();
         updateNeighborsGraphics();
@@ -182,9 +173,10 @@ class EditorTile extends FlxSprite {
             return;
         }
 
-        this.parent.floors.remove(this.floor, true);
+        var tmp = this.floor;
         this.floor.kill();
         this.floor = null;
+        this.parent.removeStructure(tmp);
 
         updateNeighborsGraphics();
     }
@@ -193,6 +185,12 @@ class EditorTile extends FlxSprite {
         for (neighbor in this.neighborTiles) {
             if (neighbor != null) {
                 neighbor.updateGraphics();
+            }
+        }
+
+        for (point in this.points) {
+            if (point != null) {
+                point.updateGraphics();
             }
         }
     }

@@ -2,7 +2,6 @@ package structures;
 
 import EditorPoint.PointNeighbors;
 import EditorPoint.TilePositions;
-import flixel.FlxSprite;
 import flixel.system.FlxAssets;
 import flixel.util.FlxColor;
 import openfl.display.BitmapData;
@@ -36,6 +35,10 @@ class Wall extends RoomStructure {
         super(x, y);
 
         this.point = point;
+    }
+
+    public function getDepth():Int {
+        return 100 * (this.point.col + this.point.row + 1);
     }
 
     public function stampFragment(fragment:Fragment) {

@@ -114,9 +114,8 @@ class EditorPoint extends FlxSprite {
             return;
         }
 
-        this.wall = new Wall(x, y - 104, this);
-        this.parent.walls.add(this.wall);
-        this.parent.walls.sort(FlxSort.byY);
+        this.wall = new Wall(x, y - 103, this);
+        this.parent.addStructure(this.wall);
 
         updateGraphics();
         updateNeighborsGraphics();
@@ -143,14 +142,15 @@ class EditorPoint extends FlxSprite {
             return;
         }
 
-        this.parent.walls.remove(this.wall, true);
+        var tmp = this.wall;
         this.wall.kill();
         this.wall = null;
+        this.parent.removeStructure(tmp);
 
         updateNeighborsGraphics();
     }
 
-    function updateGraphics() {
+    public function updateGraphics() {
         if (hasWall()) {
             this.wall.updateGraphics();
         }
@@ -160,6 +160,12 @@ class EditorPoint extends FlxSprite {
         for (neighbor in this.neighborPoints) {
             if (neighbor != null) {
                 neighbor.updateGraphics();
+            }
+        }
+
+        for (tile in this.tiles) {
+            if (tiles != null) {
+                tile.updateGraphics();
             }
         }
     }
