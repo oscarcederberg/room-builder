@@ -1,4 +1,7 @@
+package structures;
+
 import EditorPoint.PointNeighbors;
+import EditorPoint.TilePositions;
 import flixel.FlxSprite;
 import flixel.system.FlxAssets;
 import flixel.util.FlxColor;
@@ -22,11 +25,9 @@ enum Fragment {
     WALL_TRIPLE_3;
     WALL_TRIPLE_4;
     WALL_QUAD;
-    WALL_SIDE_1;
-    WALL_SIDE_2;
 }
 
-class Wall extends FlxSprite {
+class Wall extends RoomStructure {
     public static var bitmaps:haxe.ds.Map<Fragment, BitmapData> = new Map();
 
     var point:EditorPoint;
@@ -81,6 +82,16 @@ class Wall extends FlxSprite {
         } else {
             stampFragment(WALL_NONE);
         }
+    }
+
+    function tileHasFloor(tile:TilePositions):Bool {
+        var tile = point.getTile(tile);
+
+        if (tile != null) {
+            return tile.hasFloor();
+        }
+
+        return false;
     }
 
     function neighborHasWall(neighbor:PointNeighbors):Bool {

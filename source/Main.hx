@@ -2,6 +2,8 @@ package;
 
 import flixel.FlxGame;
 import openfl.display.Sprite;
+import structures.Floor;
+import structures.Wall;
 
 using StringTools;
 

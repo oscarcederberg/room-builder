@@ -5,6 +5,8 @@ import flixel.FlxState;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import haxe.ds.Vector;
 import hud.HUD;
+import structures.Floor;
+import structures.Wall;
 
 enum Tool {
     REMOVE;
@@ -17,14 +19,14 @@ class PlayState extends FlxState {
     public static inline var TILES_ROWS = 16;
 
     public var currentTool:Tool = REMOVE;
-    public var editorTiles:FlxTypedGroup<EditorTile>;
-    public var editorTilesVec:Vector<Vector<EditorTile>>;
     public var floors:FlxTypedGroup<Floor>;
-    public var editorPoints:FlxTypedGroup<EditorPoint>;
-    public var editorPointsVec:Vector<Vector<EditorPoint>>;
     public var walls:FlxTypedGroup<Wall>;
-
     public var hud:HUD;
+
+    var editorTiles:FlxTypedGroup<EditorTile>;
+    var editorTilesVec:Vector<Vector<EditorTile>>;
+    var editorPoints:FlxTypedGroup<EditorPoint>;
+    var editorPointsVec:Vector<Vector<EditorPoint>>;
 
     override public function create() {
         super.create();

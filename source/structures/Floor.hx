@@ -1,3 +1,5 @@
+package structures;
+
 import EditorTile.PointPositions;
 import EditorTile.TileNeighbors;
 import flixel.FlxG;
@@ -31,7 +33,7 @@ enum FloorFragment {
     FLOOR_LEFT_5;
 }
 
-class Floor extends FlxSprite {
+class Floor extends RoomStructure {
     public static final FLOOR_WIDTH = 48;
     public static final FLOOR_GRAPHICS_WIDTH = 45;
     public static final FLOOR_HEIGHT = 32;

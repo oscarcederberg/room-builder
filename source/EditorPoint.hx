@@ -1,14 +1,12 @@
-import EditorTile.PointPositions;
 import PlayState.Tool;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.input.keyboard.FlxKey;
-import flixel.math.FlxPoint;
-import flixel.util.FlxColor;
 import flixel.util.FlxSort;
+import structures.Wall;
 
 enum PointNeighbors {
     POINT_NEIGHBOR_UP;
+
     POINT_NEIGHBOR_RIGHT;
     POINT_NEIGHBOR_DOWN;
     POINT_NEIGHBOR_LEFT;
@@ -49,6 +47,7 @@ class EditorPoint extends FlxSprite {
         super(x, y);
 
         loadGraphic("assets/images/editor_point.png", false, EDITOR_POINT_GRAPHICS_WIDTH, EDITOR_POINT_HEIGHT);
+        this.visible = false;
     }
 
     override public function update(elapsed:Float) {
@@ -61,6 +60,10 @@ class EditorPoint extends FlxSprite {
 
     public function getNeighbor(neighbor:PointNeighbors) {
         return this.neighborPoints[neighbor];
+    }
+
+    public function getTile(tile:TilePositions) {
+        return this.tiles[tile];
     }
 
     public function handleInput(tool:Tool):Bool {

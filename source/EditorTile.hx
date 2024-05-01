@@ -2,6 +2,7 @@ import PlayState.Tool;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.util.FlxSort;
+import structures.Floor;
 
 enum TileNeighbors {
     TILE_NEIGHBOR_CORNER_UP;
