@@ -10,26 +10,26 @@ import openfl.geom.Point;
 
 enum FloorFragment {
     FLOOR_MID;
-    FLOOR_UP_1;
-    FLOOR_UP_2;
-    FLOOR_UP_3;
-    FLOOR_UP_4;
-    FLOOR_UP_5;
-    FLOOR_RIGHT_1;
-    FLOOR_RIGHT_2;
-    FLOOR_RIGHT_3;
-    FLOOR_RIGHT_4;
-    FLOOR_RIGHT_5;
-    FLOOR_DOWN_1;
-    FLOOR_DOWN_2;
-    FLOOR_DOWN_3;
-    FLOOR_DOWN_4;
-    FLOOR_DOWN_5;
-    FLOOR_LEFT_1;
-    FLOOR_LEFT_2;
-    FLOOR_LEFT_3;
-    FLOOR_LEFT_4;
-    FLOOR_LEFT_5;
+    FLOOR_UP_A;
+    FLOOR_UP_B;
+    FLOOR_UP_C;
+    FLOOR_UP_D;
+    FLOOR_UP_E;
+    FLOOR_RIGHT_A;
+    FLOOR_RIGHT_B;
+    FLOOR_RIGHT_C;
+    FLOOR_RIGHT_D;
+    FLOOR_RIGHT_E;
+    FLOOR_DOWN_A;
+    FLOOR_DOWN_B;
+    FLOOR_DOWN_C;
+    FLOOR_DOWN_D;
+    FLOOR_DOWN_E;
+    FLOOR_LEFT_A;
+    FLOOR_LEFT_B;
+    FLOOR_LEFT_C;
+    FLOOR_LEFT_D;
+    FLOOR_LEFT_E;
 }
 
 class Floor extends RoomStructure {
@@ -61,14 +61,14 @@ class Floor extends RoomStructure {
 
         stampFragment(FLOOR_MID);
 
-        updateCornerGraphics(TILE_NEIGHBOR_SIDE_UP, TILE_NEIGHBOR_CORNER_UP, TILE_NEIGHBOR_SIDE_LEFT, FLOOR_UP_1, FLOOR_UP_2, FLOOR_UP_3, FLOOR_UP_4,
-            FLOOR_UP_5);
-        updateCornerGraphics(TILE_NEIGHBOR_SIDE_RIGHT, TILE_NEIGHBOR_CORNER_RIGHT, TILE_NEIGHBOR_SIDE_UP, FLOOR_RIGHT_1, FLOOR_RIGHT_2, FLOOR_RIGHT_3,
-            FLOOR_RIGHT_4, FLOOR_RIGHT_5);
-        updateCornerGraphics(TILE_NEIGHBOR_SIDE_DOWN, TILE_NEIGHBOR_CORNER_DOWN, TILE_NEIGHBOR_SIDE_RIGHT, FLOOR_DOWN_1, FLOOR_DOWN_2, FLOOR_DOWN_3,
-            FLOOR_DOWN_4, FLOOR_DOWN_5);
-        updateCornerGraphics(TILE_NEIGHBOR_SIDE_LEFT, TILE_NEIGHBOR_CORNER_LEFT, TILE_NEIGHBOR_SIDE_DOWN, FLOOR_LEFT_1, FLOOR_LEFT_2, FLOOR_LEFT_3,
-            FLOOR_LEFT_4, FLOOR_LEFT_5);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_UP, TILE_NEIGHBOR_CORNER_UP, TILE_NEIGHBOR_SIDE_LEFT, FLOOR_UP_A, FLOOR_UP_B, FLOOR_UP_C, FLOOR_UP_D,
+            FLOOR_UP_E);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_RIGHT, TILE_NEIGHBOR_CORNER_RIGHT, TILE_NEIGHBOR_SIDE_UP, FLOOR_RIGHT_A, FLOOR_RIGHT_B, FLOOR_RIGHT_C,
+            FLOOR_RIGHT_D, FLOOR_RIGHT_E);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_DOWN, TILE_NEIGHBOR_CORNER_DOWN, TILE_NEIGHBOR_SIDE_RIGHT, FLOOR_DOWN_A, FLOOR_DOWN_B, FLOOR_DOWN_C,
+            FLOOR_DOWN_D, FLOOR_DOWN_E);
+        updateCornerGraphics(TILE_NEIGHBOR_SIDE_LEFT, TILE_NEIGHBOR_CORNER_LEFT, TILE_NEIGHBOR_SIDE_DOWN, FLOOR_LEFT_A, FLOOR_LEFT_B, FLOOR_LEFT_C,
+            FLOOR_LEFT_D, FLOOR_LEFT_E);
     }
 
     function getNeighbor(neighbor:TileNeighbors):Floor {
@@ -105,18 +105,18 @@ class Floor extends RoomStructure {
         this.graphic.bitmap.copyPixels(bitmaps[fragment], bitmaps[fragment].rect, new Point(0, 0), null, null, true);
     }
 
-    function updateCornerGraphics(side_a:TileNeighbors, corner:TileNeighbors, side_b:TileNeighbors, fragment_1:FloorFragment, fragment_2:FloorFragment,
-            fragment_3:FloorFragment, fragment_4:FloorFragment, fragment_5:FloorFragment) {
+    function updateCornerGraphics(side_a:TileNeighbors, corner:TileNeighbors, side_b:TileNeighbors, fragment_A:FloorFragment, fragment_B:FloorFragment,
+            fragment_C:FloorFragment, fragment_D:FloorFragment, fragment_E:FloorFragment) {
         if (neighborHasFloor(side_a) && neighborHasFloor(corner) && neighborHasFloor(side_b)) {
-            stampFragment(fragment_5);
+            stampFragment(fragment_E);
         } else if (neighborHasFloor(side_a) && neighborHasFloor(side_b)) {
-            stampFragment(fragment_4);
+            stampFragment(fragment_D);
         } else if (neighborHasFloor(side_a)) {
-            stampFragment(fragment_3);
+            stampFragment(fragment_C);
         } else if (neighborHasFloor(side_b)) {
-            stampFragment(fragment_2);
+            stampFragment(fragment_B);
         } else {
-            stampFragment(fragment_1);
+            stampFragment(fragment_A);
         }
     }
 

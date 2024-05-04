@@ -114,7 +114,7 @@ class EditorPoint extends FlxSprite {
             return;
         }
 
-        this.wall = new Wall(x, y - 103, this);
+        this.wall = new Wall(x, y - 104, this);
         this.parent.addStructure(this.wall);
 
         updateGraphics();
@@ -164,7 +164,7 @@ class EditorPoint extends FlxSprite {
         }
 
         for (tile in this.tiles) {
-            if (tiles != null) {
+            if (tile != null) {
                 tile.updateGraphics();
             }
         }
