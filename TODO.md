@@ -5,6 +5,7 @@
 - [ ] Editor: Fix display pixel error
 - [ ] HUD: Refactor radio button group
 - [ ] HUD: Add keybinds
+- [ ] Walls: Remake wall graphic logic
 
 ## In Progress
 
