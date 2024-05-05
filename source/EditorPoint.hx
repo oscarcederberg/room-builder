@@ -51,9 +51,11 @@ class EditorPoint extends FlxSprite {
     }
 
     override public function update(elapsed:Float) {
+        #if debug
         if (FlxG.keys.justPressed.SPACE) {
             this.visible = !this.visible;
         }
+        #end
 
         super.update(elapsed);
     }

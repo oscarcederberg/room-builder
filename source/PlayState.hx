@@ -3,6 +3,7 @@ package;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.text.FlxText;
 import flixel.util.FlxSort;
 import haxe.ds.Vector;
 import hud.HUD;
@@ -149,6 +150,7 @@ class PlayState extends FlxState {
         if (FlxG.mouse.pressedMiddle && !FlxG.mouse.justPressedMiddle) {
             FlxG.camera.scroll.x -= FlxG.mouse.deltaScreenX;
             FlxG.camera.scroll.y -= FlxG.mouse.deltaScreenY;
+            FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
         }
 
         if (FlxG.keys.pressed.CONTROL) {
@@ -160,6 +162,7 @@ class PlayState extends FlxState {
                 var newMouseWorldPos = FlxG.mouse.getWorldPosition();
                 var diffPos = newMouseWorldPos.subtractPoint(mouseWorldPos);
                 FlxG.camera.scroll.subtractPoint(diffPos);
+                FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
             }
         }
     }

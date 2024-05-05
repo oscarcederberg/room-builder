@@ -4,12 +4,15 @@ import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
+import flixel.text.FlxText;
 import flixel.util.FlxColor;
 
 class HUD extends FlxSpriteGroup {
     var parent:PlayState;
     var buttons:FlxTypedSpriteGroup<Button>;
     var buttonIcons:FlxSpriteGroup;
+
+    var debugText:FlxText;
 
     public function new(parent:PlayState) {
         super();
@@ -27,6 +30,21 @@ class HUD extends FlxSpriteGroup {
 
         this.buttonIcons = new FlxSpriteGroup();
         add(this.buttonIcons);
+
+        this.debugText = new FlxText(0, 0, 0, 'zoom: ${FlxG.camera.zoom}\nx: ${FlxG.camera.scroll.x}\ny: ${FlxG.camera.scroll.y}');
+        add(this.debugText);
+
+        #if !debug
+        this.debugText.visible = false;
+        #end
+    }
+
+    override function update(elapsed:Float) {
+        if (this.debugText.visible) {
+            this.debugText.text = 'zoom: ${FlxG.camera.zoom}\nx: ${FlxG.camera.scroll.x}\ny: ${FlxG.camera.scroll.y}';
+        }
+
+        super.update(elapsed);
     }
 
     public function addButton(iconAsset:String, ?callback:Button->Void) {
