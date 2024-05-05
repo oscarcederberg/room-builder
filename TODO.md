@@ -6,6 +6,9 @@
 - [ ] HUD: Refactor radio button group
 - [ ] HUD: Add keybinds
 - [ ] Walls: Remake wall graphic logic
+- [ ] Walls: Add room corner walls
+- [ ] Walls: Add toggle for hiding walls
+- [ ] Walls: Add option for hiding front walls
 
 ## In Progress
 
