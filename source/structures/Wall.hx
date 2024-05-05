@@ -13,12 +13,15 @@ enum Type {
     WALL_SINGLE_B;
     WALL_SINGLE_C;
     WALL_SINGLE_D;
+    WALL_SINGLE_E;
+    WALL_SINGLE_F;
     WALL_DOUBLE_A;
     WALL_DOUBLE_B;
     WALL_DOUBLE_C;
     WALL_DOUBLE_D;
     WALL_DOUBLE_E;
     WALL_DOUBLE_F;
+    WALL_DOUBLE_G;
     WALL_TRIPLE_A;
     WALL_TRIPLE_B;
     WALL_TRIPLE_C;
@@ -32,12 +35,15 @@ enum Fragment {
     WALL_TOP_SINGLE_B;
     WALL_TOP_SINGLE_C;
     WALL_TOP_SINGLE_D;
+    WALL_TOP_SINGLE_E;
+    WALL_TOP_SINGLE_F;
     WALL_TOP_DOUBLE_A;
     WALL_TOP_DOUBLE_B;
     WALL_TOP_DOUBLE_C;
     WALL_TOP_DOUBLE_D;
     WALL_TOP_DOUBLE_E;
     WALL_TOP_DOUBLE_F;
+    WALL_TOP_DOUBLE_G;
     WALL_TOP_TRIPLE_A;
     WALL_TOP_TRIPLE_B;
     WALL_TOP_TRIPLE_C;
@@ -98,58 +104,60 @@ class Wall extends RoomStructure {
         var downHasWall = neighborHasWall(POINT_NEIGHBOR_DOWN);
         var leftHasWall = neighborHasWall(POINT_NEIGHBOR_LEFT);
 
+        var upHasFloor = tileHasFloor(TILE_CORNER_UP);
+        var rightHasFloor = tileHasFloor(TILE_CORNER_RIGHT);
+        var downHasFloor = tileHasFloor(TILE_CORNER_DOWN);
+        var leftHasFloor = tileHasFloor(TILE_CORNER_LEFT);
+
         makeGraphic(48, 128, FlxColor.TRANSPARENT, true);
 
         if (upHasWall && rightHasWall && downHasWall && leftHasWall) {
             this.type = WALL_QUAD;
-            stampFragment(WALL_TOP_QUAD);
         } else if (upHasWall && rightHasWall && downHasWall) {
             this.type = WALL_TRIPLE_A;
-            stampFragment(WALL_TOP_TRIPLE_A);
         } else if (upHasWall && rightHasWall && leftHasWall) {
             this.type = WALL_TRIPLE_B;
-            stampFragment(WALL_TOP_TRIPLE_B);
         } else if (upHasWall && downHasWall && leftHasWall) {
             this.type = WALL_TRIPLE_C;
-            stampFragment(WALL_TOP_TRIPLE_C);
         } else if (rightHasWall && downHasWall && leftHasWall) {
             this.type = WALL_TRIPLE_D;
-            stampFragment(WALL_TOP_TRIPLE_D);
         } else if (upHasWall && rightHasWall) {
             this.type = WALL_DOUBLE_A;
-            stampFragment(WALL_TOP_DOUBLE_A);
         } else if (upHasWall && downHasWall) {
             this.type = WALL_DOUBLE_B;
-            stampFragment(WALL_TOP_DOUBLE_B);
         } else if (upHasWall && leftHasWall) {
-            this.type = WALL_DOUBLE_C;
-            stampFragment(WALL_TOP_DOUBLE_C);
+            if (rightHasFloor && !downHasFloor && leftHasFloor && !upHasFloor) {
+                this.type = WALL_DOUBLE_G;
+            } else {
+                this.type = WALL_DOUBLE_C;
+            }
         } else if (rightHasWall && downHasWall) {
             this.type = WALL_DOUBLE_D;
-            stampFragment(WALL_TOP_DOUBLE_D);
         } else if (rightHasWall && leftHasWall) {
             this.type = WALL_DOUBLE_E;
-            stampFragment(WALL_TOP_DOUBLE_E);
         } else if (downHasWall && leftHasWall) {
             this.type = WALL_DOUBLE_F;
-            stampFragment(WALL_TOP_DOUBLE_F);
         } else if (upHasWall) {
-            this.type = WALL_SINGLE_A;
-            stampFragment(WALL_TOP_SINGLE_A);
+            if (rightHasFloor && !downHasFloor && !leftHasFloor && !upHasFloor) {
+                this.type = WALL_SINGLE_E;
+            } else {
+                this.type = WALL_SINGLE_A;
+            }
         } else if (rightHasWall) {
             this.type = WALL_SINGLE_B;
-            stampFragment(WALL_TOP_SINGLE_B);
         } else if (downHasWall) {
             this.type = WALL_SINGLE_C;
-            stampFragment(WALL_TOP_SINGLE_C);
         } else if (leftHasWall) {
-            this.type = WALL_SINGLE_D;
-            stampFragment(WALL_TOP_SINGLE_D);
+            if (!rightHasFloor && !downHasFloor && leftHasFloor && !upHasFloor) {
+                this.type = WALL_SINGLE_F;
+            } else {
+                this.type = WALL_SINGLE_D;
+            }
         } else {
             this.type = WALL_NONE;
-            stampFragment(WALL_TOP_NONE);
         }
 
+        stampFragment(Fragment.createByIndex(this.type.getIndex()));
         stampBottomLeftFragment();
         stampBottomMiddleFragment();
         stampBottomRightFragment();
@@ -160,6 +168,9 @@ class Wall extends RoomStructure {
         var leftHasFloor = tileHasFloor(TILE_CORNER_LEFT);
 
         var fragment:Fragment = switch (this.type) {
+        case WALL_SINGLE_E | WALL_SINGLE_F | WALL_DOUBLE_G:
+            return;
+
         case WALL_NONE | WALL_SINGLE_A | WALL_SINGLE_B | WALL_DOUBLE_A:
             if (leftHasFloor && downHasFloor) {
                 WALL_BOTTOM_LEFT_B;
@@ -201,12 +212,16 @@ class Wall extends RoomStructure {
         var downHasFloor = tileHasFloor(TILE_CORNER_DOWN);
 
         var fragment:Fragment = switch (this.type) {
+        case WALL_SINGLE_E | WALL_SINGLE_F | WALL_DOUBLE_G:
+            return;
+
         case WALL_NONE | WALL_SINGLE_A | WALL_SINGLE_D | WALL_DOUBLE_D | WALL_DOUBLE_C | WALL_TRIPLE_A | WALL_TRIPLE_D | WALL_QUAD:
             if (downHasFloor) {
                 WALL_BOTTOM_MIDDLE_B;
             } else {
                 WALL_BOTTOM_MIDDLE_A;
             }
+
         case WALL_SINGLE_B | WALL_SINGLE_C | WALL_DOUBLE_A | WALL_DOUBLE_B | WALL_DOUBLE_E | WALL_DOUBLE_F | WALL_TRIPLE_B | WALL_TRIPLE_C:
             if (downHasFloor) {
                 WALL_BOTTOM_MIDDLE_D;
@@ -223,6 +238,9 @@ class Wall extends RoomStructure {
         var downHasFloor = tileHasFloor(TILE_CORNER_DOWN);
 
         var fragment:Fragment = switch (this.type) {
+        case WALL_SINGLE_E | WALL_SINGLE_F | WALL_DOUBLE_G:
+            return;
+
         case WALL_NONE | WALL_SINGLE_C | WALL_SINGLE_D | WALL_DOUBLE_F:
             if (downHasFloor && rightHasFloor) {
                 WALL_BOTTOM_RIGHT_B;
