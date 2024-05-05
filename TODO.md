@@ -10,10 +10,12 @@
 - [ ] Walls: Add room corner walls
 - [ ] Walls: Add toggle for hiding walls
 - [ ] Walls: Add option for hiding front walls
+- [ ] Walls: Remove walls with no neighbouring floors
 
 ## In Progress
 
 ## Done
+- [X] Editor: Disable context menu
 - [X] Editor: Add keybinds for dragging on web
 - [X] Editor: Make EditorPoint smaller
 - [X] Editor: Zoom into point

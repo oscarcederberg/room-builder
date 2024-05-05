@@ -11,6 +11,8 @@ class Main extends Sprite {
     public function new() {
         super();
 
+        stage.showDefaultContextMenu = false;
+
         Floor.loadAllFragmentAssets();
         Wall.loadAllFragmentAssets();
 
