@@ -3,6 +3,7 @@ package;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.math.FlxPoint;
 import flixel.text.FlxText;
 import flixel.util.FlxSort;
 import haxe.ds.Vector;
@@ -85,19 +86,19 @@ class PlayState extends FlxState {
 
         this.hud = new HUD(this);
         this.hud.addButton("assets/images/hud/remove.png", (button) -> {
-            if (button.isSelected()) {
-                this.currentTool = REMOVE;
-            }
+            this.currentTool = REMOVE;
         });
         this.hud.addButton("assets/images/hud/floor.png", (button) -> {
-            if (button.isSelected()) {
-                this.currentTool = FLOOR;
-            }
+            this.currentTool = FLOOR;
         });
         this.hud.addButton("assets/images/hud/wall.png", (button) -> {
-            if (button.isSelected()) {
-                this.currentTool = WALL;
-            }
+            this.currentTool = WALL;
+        });
+        this.hud.addSmallButton("assets/images/hud/zoom_in.png", (_) -> {
+            zoom(1);
+        });
+        this.hud.addSmallButton("assets/images/hud/zoom_out.png", (_) -> {
+            zoom(-1);
         });
 
         add(hud);
@@ -129,8 +130,6 @@ class PlayState extends FlxState {
     }
 
     public function handleInput() {
-        var mouseWorldPos = FlxG.mouse.getWorldPosition();
-
         #if web
         if (FlxG.keys.pressed.CONTROL) {
             if (FlxG.mouse.pressed && !FlxG.mouse.justPressed) {
@@ -167,30 +166,14 @@ class PlayState extends FlxState {
 
         #if web
         if (FlxG.keys.pressed.CONTROL && (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN)) {
-            var oldZoom = FlxG.camera.zoom;
-            var value = if (FlxG.keys.justPressed.UP) 1 else -1;
-            var newZoom = Math.min(4, Math.max(1, oldZoom + value));
-
-            if (oldZoom != newZoom) {
-                FlxG.camera.zoom = newZoom;
-                var newMouseWorldPos = FlxG.mouse.getWorldPosition();
-                var diffPos = newMouseWorldPos.subtractPoint(mouseWorldPos);
-                FlxG.camera.scroll.subtractPoint(diffPos);
-                FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
-            }
+            var by = if (FlxG.keys.justPressed.UP) 1 else -1;
+            var into = FlxG.mouse.getWorldPosition();
+            zoomInto(by, into);
         }
         #else
         if (FlxG.keys.pressed.CONTROL) {
-            var oldZoom = FlxG.camera.zoom;
-            var newZoom = Math.min(4, Math.max(1, oldZoom + FlxG.mouse.wheel));
-
-            if (oldZoom != newZoom) {
-                FlxG.camera.zoom = newZoom;
-                var newMouseWorldPos = FlxG.mouse.getWorldPosition();
-                var diffPos = newMouseWorldPos.subtractPoint(mouseWorldPos);
-                FlxG.camera.scroll.subtractPoint(diffPos);
-                FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
-            }
+            var into = FlxG.mouse.getWorldPosition();
+            zoomInto(FlxG.mouse.wheel, into);
         }
         #end
     }
@@ -198,5 +181,28 @@ class PlayState extends FlxState {
     public function removeStructure(structure:RoomStructure) {
         this.structures.remove(structure, true);
         this.structures.sort((order, a, b) -> FlxSort.byValues(order, a.getDepth(), b.getDepth()));
+    }
+
+    public function zoom(by:Int) {
+        var oldZoom = FlxG.camera.zoom;
+        var newZoom = Math.min(4, Math.max(1, oldZoom + by));
+
+        if (oldZoom != newZoom) {
+            FlxG.camera.zoom = newZoom;
+            FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
+        }
+    }
+
+    public function zoomInto(by:Int, into:FlxPoint) {
+        var oldZoom = FlxG.camera.zoom;
+        var newZoom = Math.min(4, Math.max(1, oldZoom + by));
+
+        if (oldZoom != newZoom) {
+            FlxG.camera.zoom = newZoom;
+            var newMouseWorldPos = FlxG.mouse.getWorldPosition();
+            var diffPos = newMouseWorldPos.subtractPoint(into);
+            FlxG.camera.scroll.subtractPoint(diffPos);
+            FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
+        }
     }
 }

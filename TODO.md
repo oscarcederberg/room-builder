@@ -4,7 +4,6 @@
 - [ ] Code: Refactor tile group
 - [ ] Editor: Move camera to middle of editor
 - [ ] HUD: Refactor radio button group
-- [ ] HUD: Add zoom buttons
 - [ ] HUD: Add keybinds
 - [ ] Walls: Remake wall graphic logic
 - [ ] Walls: Add toggle for hiding walls
@@ -14,6 +13,7 @@
 ## In Progress
 
 ## Done
+- [X] HUD: Add zoom buttons
 - [X] Walls: Add room corner walls
 - [X] Editor: Disable context menu
 - [X] Editor: Add keybinds for dragging on web

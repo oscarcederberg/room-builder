@@ -10,6 +10,7 @@ import flixel.util.FlxColor;
 class HUD extends FlxSpriteGroup {
     var parent:PlayState;
     var buttons:FlxTypedSpriteGroup<Button>;
+    var smallButtons:FlxTypedSpriteGroup<SmallButton>;
     var buttonIcons:FlxSpriteGroup;
 
     var debugText:FlxText;
@@ -27,6 +28,9 @@ class HUD extends FlxSpriteGroup {
 
         this.buttons = new FlxTypedSpriteGroup<Button>();
         add(this.buttons);
+
+        this.smallButtons = new FlxTypedSpriteGroup<SmallButton>();
+        add(this.smallButtons);
 
         this.buttonIcons = new FlxSpriteGroup();
         add(this.buttonIcons);
@@ -48,7 +52,7 @@ class HUD extends FlxSpriteGroup {
         super.update(elapsed);
     }
 
-    public function addButton(iconAsset:String, ?callback:Button->Void) {
+    public function addButton(iconAsset:String, ?callback:BaseButton->Void) {
         var x = this.buttons.length * Button.WIDTH;
         var y = FlxG.height - Button.HEIGHT;
         var button = new Button(x, y, (button) -> {
@@ -60,14 +64,28 @@ class HUD extends FlxSpriteGroup {
                 callback(button);
             }
         });
-        var icon = new FlxSprite(x, y, iconAsset);
 
+        var icon = new FlxSprite(x, y, iconAsset);
         this.buttons.add(button);
         this.buttonIcons.add(icon);
-
         if (this.buttons.length == 1) {
             button.setSelected(true);
         }
+    }
+
+    public function addSmallButton(iconAsset:String, ?callback:BaseButton->Void) {
+        var x = this.smallButtons.length * SmallButton.WIDTH;
+        var y = FlxG.height - Button.HEIGHT - SmallButton.HEIGHT;
+        var smallButton = new SmallButton(x, y, (button) -> {
+            if (callback != null) {
+                callback(button);
+            }
+            button.setSelected(false);
+        });
+
+        var icon = new FlxSprite(x, y, iconAsset);
+        this.smallButtons.add(smallButton);
+        this.buttonIcons.add(icon);
     }
 
     public function handleInput():Bool {
@@ -77,10 +95,16 @@ class HUD extends FlxSpriteGroup {
             }
         }
 
+        for (button in this.smallButtons) {
+            if (button.handleInput()) {
+                return true;
+            }
+        }
+
         return false;
     }
 
-    private function updateButtonStates(updatedButton:Button) {
+    private function updateButtonStates(updatedButton:BaseButton) {
         for (button in this.buttons) {
             if (button != updatedButton) {
                 button.setSelected(false);
