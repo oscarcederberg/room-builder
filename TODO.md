@@ -3,6 +3,7 @@
 ## Backlog
 - [ ] Code: Refactor tile group
 - [ ] Editor: Fix display pixel error
+- [ ] Editor: Convert EditorPoint into smaller hitboxes
 - [ ] HUD: Refactor radio button group
 - [ ] HUD: Add keybinds
 - [ ] Walls: Remake wall graphic logic
