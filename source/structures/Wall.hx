@@ -53,7 +53,6 @@ enum Fragment {
     WALL_BOTTOM_LEFT_H;
     WALL_BOTTOM_LEFT_I;
     WALL_BOTTOM_LEFT_J;
-    WALL_BOTTOM_LEFT_K;
     WALL_BOTTOM_MIDDLE_A;
     WALL_BOTTOM_MIDDLE_B;
     WALL_BOTTOM_MIDDLE_C;
@@ -68,7 +67,6 @@ enum Fragment {
     WALL_BOTTOM_RIGHT_H;
     WALL_BOTTOM_RIGHT_I;
     WALL_BOTTOM_RIGHT_J;
-    WALL_BOTTOM_RIGHT_K;
 }
 
 class Wall extends RoomStructure {
@@ -175,11 +173,11 @@ class Wall extends RoomStructure {
 
         case WALL_SINGLE_C | WALL_DOUBLE_B | WALL_DOUBLE_D | WALL_DOUBLE_F | WALL_TRIPLE_A | WALL_TRIPLE_C | WALL_TRIPLE_D | WALL_QUAD:
             if (leftHasFloor && downHasFloor) {
-                WALL_BOTTOM_LEFT_K;
+                WALL_BOTTOM_LEFT_J;
             } else if (leftHasFloor) {
                 WALL_BOTTOM_LEFT_I;
             } else if (downHasFloor) {
-                WALL_BOTTOM_LEFT_K;
+                WALL_BOTTOM_LEFT_J;
             } else {
                 WALL_BOTTOM_LEFT_I;
             }
@@ -249,11 +247,11 @@ class Wall extends RoomStructure {
 
         case WALL_SINGLE_B | WALL_DOUBLE_A | WALL_DOUBLE_D | WALL_DOUBLE_E | WALL_TRIPLE_A | WALL_TRIPLE_B | WALL_TRIPLE_D | WALL_QUAD:
             if (downHasFloor && rightHasFloor) {
-                WALL_BOTTOM_RIGHT_K;
+                WALL_BOTTOM_RIGHT_J;
             } else if (rightHasFloor) {
                 WALL_BOTTOM_RIGHT_I;
             } else if (downHasFloor) {
-                WALL_BOTTOM_RIGHT_K;
+                WALL_BOTTOM_RIGHT_J;
             } else {
                 WALL_BOTTOM_RIGHT_I;
             }
