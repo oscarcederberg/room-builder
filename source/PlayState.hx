@@ -131,6 +131,24 @@ class PlayState extends FlxState {
     public function handleInput() {
         var mouseWorldPos = FlxG.mouse.getWorldPosition();
 
+        #if web
+        if (FlxG.keys.pressed.CONTROL) {
+            if (FlxG.mouse.pressed && !FlxG.mouse.justPressed) {
+                FlxG.camera.scroll.x -= FlxG.mouse.deltaScreenX;
+                FlxG.camera.scroll.y -= FlxG.mouse.deltaScreenY;
+                FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
+            }
+            return;
+        }
+        #else
+        if (FlxG.mouse.pressedMiddle && !FlxG.mouse.justPressedMiddle) {
+            FlxG.camera.scroll.x -= FlxG.mouse.deltaScreenX;
+            FlxG.camera.scroll.y -= FlxG.mouse.deltaScreenY;
+            FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
+            return;
+        }
+        #end
+
         if (this.hud.handleInput()) {
             return;
         }
@@ -147,12 +165,21 @@ class PlayState extends FlxState {
             }
         }
 
-        if (FlxG.mouse.pressedMiddle && !FlxG.mouse.justPressedMiddle) {
-            FlxG.camera.scroll.x -= FlxG.mouse.deltaScreenX;
-            FlxG.camera.scroll.y -= FlxG.mouse.deltaScreenY;
-            FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
-        }
+        #if web
+        if (FlxG.keys.pressed.CONTROL && (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN)) {
+            var oldZoom = FlxG.camera.zoom;
+            var value = if (FlxG.keys.justPressed.UP) 1 else -1;
+            var newZoom = Math.min(4, Math.max(1, oldZoom + value));
 
+            if (oldZoom != newZoom) {
+                FlxG.camera.zoom = newZoom;
+                var newMouseWorldPos = FlxG.mouse.getWorldPosition();
+                var diffPos = newMouseWorldPos.subtractPoint(mouseWorldPos);
+                FlxG.camera.scroll.subtractPoint(diffPos);
+                FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
+            }
+        }
+        #else
         if (FlxG.keys.pressed.CONTROL) {
             var oldZoom = FlxG.camera.zoom;
             var newZoom = Math.min(4, Math.max(1, oldZoom + FlxG.mouse.wheel));
@@ -165,6 +192,7 @@ class PlayState extends FlxState {
                 FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
             }
         }
+        #end
     }
 
     public function removeStructure(structure:RoomStructure) {

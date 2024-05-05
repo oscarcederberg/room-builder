@@ -2,7 +2,6 @@
 
 ## Backlog
 - [ ] Code: Refactor tile group
-- [ ] Editor: Add keybinds for dragging on web
 - [ ] Editor: Move camera to middle of editor
 - [ ] HUD: Refactor radio button group
 - [ ] HUD: Add zoom buttons
@@ -15,6 +14,7 @@
 ## In Progress
 
 ## Done
+- [X] Editor: Add keybinds for dragging on web
 - [X] Editor: Make EditorPoint smaller
 - [X] Editor: Zoom into point
 - [X] Editor: Fix display pixel error
