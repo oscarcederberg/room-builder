@@ -32,6 +32,7 @@ class HUD extends FlxSpriteGroup {
         add(this.buttonIcons);
 
         this.debugText = new FlxText(0, 0, 0, 'zoom: ${FlxG.camera.zoom}\nx: ${FlxG.camera.scroll.x}\ny: ${FlxG.camera.scroll.y}');
+        this.debugText.setBorderStyle(FlxTextBorderStyle.OUTLINE_FAST, FlxColor.fromRGB(32, 32, 64), 1);
         add(this.debugText);
 
         #if !debug

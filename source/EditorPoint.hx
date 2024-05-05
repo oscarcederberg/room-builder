@@ -20,9 +20,9 @@ enum TilePositions {
 }
 
 class EditorPoint extends FlxSprite {
-    public static final EDITOR_POINT_WIDTH = 48;
-    public static final EDITOR_POINT_GRAPHICS_WIDTH = 45;
-    public static final EDITOR_POINT_HEIGHT = 16;
+    public static final EDITOR_POINT_WIDTH = 36;
+    public static final EDITOR_POINT_GRAPHICS_WIDTH = 33;
+    public static final EDITOR_POINT_HEIGHT = 12;
     public static final EDITOR_POINT_Y_OFFSET = 0;
 
     public var col:Int;
@@ -116,7 +116,7 @@ class EditorPoint extends FlxSprite {
             return;
         }
 
-        this.wall = new Wall(x, y - 104, this);
+        this.wall = new Wall(x - 6, y - 106, this);
         this.parent.addStructure(this.wall);
 
         updateGraphics();

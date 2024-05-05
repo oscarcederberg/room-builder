@@ -2,8 +2,10 @@
 
 ## Backlog
 - [ ] Code: Refactor tile group
-- [ ] Editor: Convert EditorPoint into smaller hitboxes
+- [ ] Editor: Add keybinds for dragging on web
+- [ ] Editor: Move camera to middle of editor
 - [ ] HUD: Refactor radio button group
+- [ ] HUD: Add zoom buttons
 - [ ] HUD: Add keybinds
 - [ ] Walls: Remake wall graphic logic
 - [ ] Walls: Add room corner walls
@@ -13,6 +15,7 @@
 ## In Progress
 
 ## Done
+- [X] Editor: Make EditorPoint smaller
 - [X] Editor: Zoom into point
 - [X] Editor: Fix display pixel error
 - [X] Editor: Fix tile coordinate placement
