@@ -19,8 +19,8 @@ enum Tool {
 }
 
 class PlayState extends FlxState {
-    public static inline var TILES_COLS = 16;
-    public static inline var TILES_ROWS = 16;
+    public static inline var TILES_COLS = 32;
+    public static inline var TILES_ROWS = 32;
 
     public var currentTool:Tool = REMOVE;
     public var hud:HUD;
@@ -102,6 +102,9 @@ class PlayState extends FlxState {
         });
 
         add(hud);
+
+        centerCamera();
+        refreshCameraScrollBounds();
     }
 
     override public function update(elapsed:Float) {
@@ -190,6 +193,7 @@ class PlayState extends FlxState {
         if (oldZoom != newZoom) {
             FlxG.camera.zoom = newZoom;
             FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
+            refreshCameraScrollBounds();
         }
     }
 
@@ -203,6 +207,26 @@ class PlayState extends FlxState {
             var diffPos = newMouseWorldPos.subtractPoint(into);
             FlxG.camera.scroll.subtractPoint(diffPos);
             FlxG.camera.scroll.set(Math.round(FlxG.camera.scroll.x), Math.round(FlxG.camera.scroll.y));
+            refreshCameraScrollBounds();
         }
+    }
+
+    private function centerCamera() {
+        var midCol = Math.round(TILES_COLS / 2);
+        var midRow = Math.round(TILES_ROWS / 2);
+        var midTile = this.editorTilesVec[midCol][midRow];
+
+        this.camera.scroll.x = Math.round(midTile.x - FlxG.width / 2 + EditorTile.EDITOR_TILE_WIDTH / 2);
+        this.camera.scroll.y = Math.round(midTile.y - FlxG.height / 2);
+    }
+
+    private function refreshCameraScrollBounds() {
+        var gameHalfWidth = FlxG.width / (2 * FlxG.camera.zoom);
+        var gameHalfHeight = FlxG.height / (2 * FlxG.camera.zoom);
+        var minX = this.editorTilesVec[0][TILES_ROWS - 1].x - gameHalfWidth + EditorTile.EDITOR_TILE_GRAPHICS_WIDTH / 2;
+        var maxX = this.editorTilesVec[TILES_COLS - 1][0].x + gameHalfWidth + EditorTile.EDITOR_TILE_GRAPHICS_WIDTH / 2;
+        var minY = this.editorTilesVec[0][0].y - gameHalfHeight + EditorTile.EDITOR_TILE_HEIGHT / 2;
+        var maxY = this.editorTilesVec[TILES_COLS - 1][TILES_ROWS - 1].y + gameHalfHeight + EditorTile.EDITOR_TILE_HEIGHT / 2;
+        this.camera.setScrollBounds(minX, maxX, minY, maxY);
     }
 }

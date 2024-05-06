@@ -2,7 +2,6 @@
 
 ## Backlog
 - [ ] Code: Refactor tile group
-- [ ] Editor: Move camera to middle of editor
 - [ ] HUD: Refactor radio button group
 - [ ] HUD: Add keybinds
 - [ ] Walls: Remake wall graphic logic
@@ -13,6 +12,8 @@
 ## In Progress
 
 ## Done
+- [X] Editor: Set camera bounds
+- [X] Editor: Center camera on start
 - [X] HUD: Add zoom buttons
 - [X] Walls: Add room corner walls
 - [X] Editor: Disable context menu
